@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | الصلاحيات</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #1a2a6c;
+            --medium-blue: #2a4a9c;
+            --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0;
+            --gold: #f4a261;
+            --gold-dark: #e76f51;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --gray: #6c757d;
+            --dark: #1e2a3e;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --sidebar-width: 270px;
+            --header-height: 65px;
+        }
+
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           APP CONTAINER
+           ======================================== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           SIDEBAR (same as dashboard)
+           ======================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .sidebar-logo .logo-icon i {
+            font-size: 28px;
+            color: var(--gold);
+        }
+
+        .sidebar-logo h3 {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .sidebar-logo p {
+            font-size: 10px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .user-avatar i {
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--gold);
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--gold);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 0 25px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        .page-title p {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #fdecea;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        /* ========================================
+           TOOLBAR
+           ======================================== */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-box button:hover {
+            background: var(--medium-blue);
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46,204,113,0.3);
+        }
+
+        /* ========================================
+           FILTERS
+           ======================================== */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: var(--white);
+            padding: 15px 20px;
+            border-radius: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+            background: white;
+        }
+
+        /* ========================================
+           userS TABLE
+           ======================================== */
+        .roles-table-container {
+            background: var(--white);
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .roles-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .roles-table th {
+            text-align: right;
+            padding: 16px;
+            background: var(--dark-blue);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .roles-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+
+        .roles-table tr:hover {
+            background: var(--light-gray);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--gold);
+            color: var(--dark-blue);
+        }
+
+        /* ========================================
+           MODAL
+           ======================================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--dark-blue);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-save {
+            padding: 10px 24px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            padding: 10px 24px;
+            background: var(--gray);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* ========================================
+           PAGINATION
+           ======================================== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        .pagination button {
+            padding: 8px 14px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .pagination button:hover:not(.active) {
+            background: var(--light-gray);
+        }
+
+        /* ========================================
+           LOADING & EMPTY STATES
+           ======================================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e9ecef;
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 400px;
+            font-family: inherit;
+        }
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-30px); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--gray);
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1000;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name" id="userName">أحمد منصور</div>
+            <div class="user-role" id="userRole">مدير النظام</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>الطلاب</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="trainers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span>المدربين</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="schedule.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>الجدول</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>المدفوعات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>التقارير</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link active">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h2>إدارة الصلاحيات</h2>
+                <p>إضافة وتعديل الصلاحيات</p>
+            </div>
+            <div class="header-actions">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>خروج</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="بحث باسم الصلاحية...">
+                    <button id="searchBtn"><i class="fas fa-search"></i> بحث</button>
+                </div>
+                <button class="btn-add" id="addRoleBtn">
+                    <i class="fas fa-plus"></i>
+                    <span>إضافة صلاحية جديدة</span>
+                </button>
+            </div>
+
+            <!-- users Table -->
+            <div class="users-table-container">
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>اسم الصلاحية</th>
+                            <th>الوصف</th>
+                            <th>القاعات المسموحة</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align: center;">جاري التحميل...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </main>
+</div>
+
+<!-- Add/Edit user Modal -->
+<div class="modal" id="roleModal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 id="modalTitle">إضافة صلاحية جديدة</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="roleForm">
+                <input type="hidden" id="userId" value="">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>اسم الصلاحية *</label>
+                        <input type="text" id="roleName" required placeholder="أدخل اسم الصلاحية">
+                    </div>
+                    <div class="form-group">
+                        <label>الوصف</label>
+                        <input type="text" id="roleDesc" placeholder="وصف الصلاحية">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">الأدوار (القاعات) المسموح بها</label>
+                    <div id="floorsCheckboxes" style="display:flex; gap:15px; flex-wrap:wrap; padding: 10px; background: #f8f9fa; border-radius: 8px;"></div>
+                </div>
+                <div class="form-group">
+                    <label style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 10px;">صلاحيات الصفحات</label>
+                    <div style="background: #f8f9fa; border-radius: 8px; padding: 10px; max-height: 300px; overflow-y: auto;">
+                        <table class="users-table" style="min-width:100%; font-size:13px; background: white;">
+                            <thead>
+                                <tr>
+                                    <th>الصفحة / النظام</th>
+                                    <th>عرض (View)</th>
+                                    <th>تعديل (Edit)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permissionsCheckboxes">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="cancelModal">إلغاء</button>
+            <button class="btn-save" id="saveRole">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+    
+    let currentUser = null;
+    let allRoles = [];
+    let allPermissions = [];
+    let allFloors = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    async function apiCall(action, data = {}) {
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...data })
+            });
+            const result = await response.json();
+            if (result.success === false) throw new Error(result.message || 'Error');
+            return result.data !== undefined ? result.data : result;
+        } catch (error) {
+            showToast(error.message || 'Error', 'error');
+            throw error;
+        }
+    }
+
+    const Validators = {
+        required: (val) => val !== null && val !== undefined && String(val).trim() !== '',
+    };
+
+    function validateForm(rules) {
+        let isValid = true;
+        for (const [fieldId, checks] of Object.entries(rules)) {
+            const el = document.getElementById(fieldId);
+            if (!el) continue;
+            const val = el.value;
+            for (const check of checks) {
+                if (!check.fn(val)) {
+                    el.style.borderColor = 'var(--danger)';
+                    isValid = false;
+                    break;
+                }
+            }
+            if (isValid) el.style.borderColor = '#e9ecef';
+        }
+        return isValid;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (!userStr) {
+            window.location.href = 'index.html';
+            return;
+        }
+        try { currentUser = JSON.parse(userStr); } 
+        catch(e) { window.location.href = 'index.html'; return; }
+        
+        document.getElementById('userName').textContent = currentUser.fullName || currentUser.username;
+        document.getElementById('userRole').textContent = currentUser.roleId == 1 ? 'مدير النظام' : 'مستخدم';
+        
+        document.getElementById('searchBtn').addEventListener('click', () => searchRoles());
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchRoles();
+        });
+        
+        document.getElementById('addRoleBtn').addEventListener('click', () => openAddModal());
+        document.getElementById('closeModal').addEventListener('click', () => closeModal());
+        document.getElementById('cancelModal').addEventListener('click', () => closeModal());
+        document.getElementById('saveRole').addEventListener('click', () => saveRole());
+        
+        loadData();
+    });
+
+    async function loadData() {
+        showLoading(true);
+        try {
+            const [rolesRes, permsRes, floorsRes] = await Promise.all([
+                apiCall('getAllRoles'),
+                apiCall('getAllPermissions'),
+                apiCall('getAllFloors')
+            ]);
+            allRoles = rolesRes || [];
+            allPermissions = permsRes || [];
+            allFloors = floorsRes || [];
+            
+            filterAndRender();
+            renderPermissionsCheckboxes();
+            renderFloorsCheckboxes();
+        } catch (error) {}
+        showLoading(false);
+    }
+    
+    function renderPermissionsCheckboxes() {
+        const tbody = document.getElementById('permissionsCheckboxes');
+        const modules = [...new Set(allPermissions.map(p => p.module))];
+        const moduleNames = {
+            'dashboard': 'الرئيسية (Dashboard)',
+            'students': 'الطلاب (Students)',
+            'trainers': 'المدربين (Trainers)',
+            'schedule': 'الجدول (Schedule)',
+            'payments': 'المدفوعات (Payments)',
+            'reports': 'التقارير (Reports)',
+            'settings': 'المستخدمين (Users)',
+            'departments': 'الأقسام (Departments)',
+            'courses': 'الكورسات (Courses)',
+            'floors': 'الأدوار (Floors)',
+            'roles': 'الصلاحيات (Roles)'
+        };
+        
+        tbody.innerHTML = modules.map(mod => {
+            const viewPerm = allPermissions.find(p => p.module === mod && p.action === 'view');
+            const editPerm = allPermissions.find(p => p.module === mod && p.action === 'edit');
+            
+            return `
+                <tr>
+                    <td><strong>${moduleNames[mod] || mod}</strong></td>
+                    <td style="text-align: center;">${viewPerm ? `<input type="checkbox" class="perm-cb" style="transform: scale(1.3); cursor: pointer;" data-id="${viewPerm.id}" id="perm_${viewPerm.id}">` : '-'}</td>
+                    <td style="text-align: center;">${editPerm ? `<input type="checkbox" class="perm-cb" style="transform: scale(1.3); cursor: pointer;" data-id="${editPerm.id}" id="perm_${editPerm.id}">` : '-'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderFloorsCheckboxes() {
+        const container = document.getElementById('floorsCheckboxes');
+        container.innerHTML = allFloors.map(f => `
+            <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" class="floor-cb" value="${f.id}" style="transform: scale(1.2);"> 
+                ${f.name}
+            </label>
+        `).join('');
+    }
+    
+    function filterAndRender() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        let filtered = [...allRoles];
+        
+        if (searchTerm) {
+            filtered = filtered.filter(s => 
+                (s.name && s.name.toLowerCase().includes(searchTerm)) ||
+                (s.description && s.description.toLowerCase().includes(searchTerm))
+            );
+        }
+        renderTable(filtered);
+    }
+    
+    function searchRoles() {
+        currentPage = 1;
+        filterAndRender();
+    }
+    
+    function renderTable(roles) {
+        const tbody = document.getElementById('rolesTableBody');
+        if (!roles || roles.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">لا يوجد صلاحيات</td></tr>';
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
+        
+        const totalPages = Math.ceil(roles.length / rowsPerPage);
+        const start = (currentPage - 1) * rowsPerPage;
+        const paginated = roles.slice(start, start + rowsPerPage);
+        
+        tbody.innerHTML = paginated.map(s => {
+            let floorsStr = '';
+            if (s.allowedFloors && s.allowedFloors !== '*') {
+                const floorIds = s.allowedFloors.toString().split(',');
+                floorsStr = floorIds.map(fid => {
+                    const f = allFloors.find(fl => fl.id == fid);
+                    return f ? `<span style="background: #e9ecef; padding: 2px 6px; border-radius: 4px; font-size: 11px; margin: 2px; display: inline-block;">${f.name}</span>` : '';
+                }).join('');
+            } else if (s.allowedFloors === '*') {
+                floorsStr = '<span style="background: var(--primary-blue); color: white; padding: 2px 6px; border-radius: 4px; font-size: 11px;">كل الأدوار</span>';
+            }
+            
+            return `
+                <tr>
+                    <td><strong>${s.id || '-'}</strong></td>
+                    <td>${s.name || '-'}</td>
+                    <td>${s.description || '-'}</td>
+                    <td>${floorsStr || '-'}</td>
+                    <td class="action-buttons">
+                        <button class="btn-icon btn-edit" onclick="editRole(${s.id})"><i class="fas fa-edit"></i></button>
+                        ${s.id != 1 ? `<button class="btn-icon btn-delete" onclick="deleteRole(${s.id})"><i class="fas fa-trash"></i></button>` : ''}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        renderPagination(totalPages);
+    }
+    
+    function renderPagination(totalPages) {
+        const container = document.getElementById('pagination');
+        if (totalPages <= 1) { container.innerHTML = ''; return; }
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    function goToPage(page) { currentPage = page; filterAndRender(); }
+    
+    async function editRole(id) {
+        const role = allRoles.find(s => s.id == id);
+        if (role) {
+            document.getElementById('modalTitle').textContent = 'تعديل الصلاحية';
+            document.getElementById('userId').value = role.id;
+            document.getElementById('roleName').value = role.name || '';
+            document.getElementById('roleDesc').value = role.description || '';
+            
+            document.querySelectorAll('.perm-cb').forEach(cb => cb.checked = false);
+            document.querySelectorAll('.floor-cb').forEach(cb => cb.checked = false);
+            
+            if (role.allowedFloors) {
+                const allowedIds = role.allowedFloors.toString().split(',');
+                document.querySelectorAll('.floor-cb').forEach(cb => {
+                    if (allowedIds.includes(cb.value) || role.allowedFloors === '*') cb.checked = true;
+                });
+            }
+            
+            showLoading(true);
+            try {
+                const rolePermIds = await apiCall('getRolePermissions', { roleId: role.id });
+                (rolePermIds || []).forEach(pid => {
+                    const cb = document.getElementById('perm_' + pid);
+                    if (cb) cb.checked = true;
+                });
+            } catch (e) {}
+            showLoading(false);
+            
+            document.getElementById('roleModal').classList.add('show');
+        }
+    }
+    
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'إضافة صلاحية جديدة';
+        document.getElementById('roleForm').reset();
+        document.getElementById('userId').value = '';
+        document.querySelectorAll('.perm-cb').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.floor-cb').forEach(cb => cb.checked = false);
+        document.getElementById('roleModal').classList.add('show');
+    }
+    
+    function closeModal() {
+        document.getElementById('roleModal').classList.remove('show');
+    }
+    
+    async function saveRole() {
+        const rules = {
+            roleName: [{ fn: Validators.required, msg: 'الاسم مطلوب' }]
+        };
+        if (!validateForm(rules)) return;
+        
+        const selectedFloors = Array.from(document.querySelectorAll('.floor-cb:checked')).map(cb => cb.value).join(',');
+        const selectedPerms = Array.from(document.querySelectorAll('.perm-cb:checked')).map(cb => parseInt(cb.getAttribute('data-id')));
+        
+        const roleData = {
+            id: document.getElementById('userId').value || null,
+            name: document.getElementById('roleName').value,
+            description: document.getElementById('roleDesc').value,
+            status: 'Active',
+            allowedFloors: selectedFloors
+        };
+        
+        showLoading(true);
+        try {
+            const res = await apiCall('saveRole', { data: roleData });
+            const roleId = res.roleId || roleData.id;
+            
+            if (roleId) {
+                await apiCall('saveRolePermissions', { roleId: roleId, permissionIds: selectedPerms });
+            }
+            
+            showToast('تم الحفظ بنجاح', 'success');
+            closeModal();
+            loadData();
+        } catch (error) {}
+        showLoading(false);
+    }
+    
+    async function deleteRole(id) {
+        if (id == 1) {
+            showToast('لا يمكن حذف صلاحية مدير النظام', 'error');
+            return;
+        }
+        if (confirm('هل أنت متأكد من حذف هذه الصلاحية؟')) {
+            showLoading(true);
+            try {
+                await apiCall('deleteRole', { id: id });
+                showToast('تم الحذف بنجاح', 'success');
+                loadData();
+            } catch (error) {}
+            showLoading(false);
+        }
+    }
+    
+    function showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) overlay.classList.add('show');
+        else overlay.classList.remove('show');
+    }
+    
+    window.editRole = editRole;
+    window.deleteRole = deleteRole;
+    window.goToPage = goToPage;
+</script>
+<script src="sidebar.js"></script>
+</body>
+</html>

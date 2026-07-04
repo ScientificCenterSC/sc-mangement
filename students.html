@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | إدارة الطلاب</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #1a2a6c;
+            --medium-blue: #2a4a9c;
+            --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0;
+            --gold: #f4a261;
+            --gold-dark: #e76f51;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --gray: #6c757d;
+            --dark: #1e2a3e;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --sidebar-width: 270px;
+            --header-height: 65px;
+        }
+
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           APP CONTAINER
+           ======================================== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           SIDEBAR (same as dashboard)
+           ======================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 10px;
+        }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .sidebar-logo .logo-icon i {
+            font-size: 28px;
+            color: var(--gold);
+        }
+
+        .sidebar-logo h3 {
+            font-size: 18px;
+            margin-bottom: 3px;
+        }
+
+        .sidebar-logo p {
+            font-size: 10px;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .user-avatar i {
+            font-size: 24px;
+            color: var(--dark-blue);
+        }
+
+        .user-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--gold);
+            margin-top: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-link:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background: var(--gold);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .nav-link i {
+            width: 22px;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 0 25px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+
+        .page-title p {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 2px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logout-btn:hover {
+            background: #fdecea;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .content-area {
+            padding: 25px;
+        }
+
+        /* ========================================
+           TOOLBAR
+           ======================================== */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .search-box button {
+            padding: 12px 20px;
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-box button:hover {
+            background: var(--medium-blue);
+        }
+
+        .btn-add {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--success), #27ae60);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(46,204,113,0.3);
+        }
+
+        /* ========================================
+           FILTERS
+           ======================================== */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+            background: var(--white);
+            padding: 15px 20px;
+            border-radius: 16px;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .filter-group select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+            background: white;
+        }
+
+        /* ========================================
+           STUDENTS TABLE
+           ======================================== */
+        .students-table-container {
+            background: var(--white);
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .students-table th {
+            text-align: right;
+            padding: 16px;
+            background: var(--dark-blue);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .students-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+
+        .students-table tr:hover {
+            background: var(--light-gray);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-view {
+            background: var(--gold);
+            color: var(--dark-blue);
+        }
+
+        /* ========================================
+           MODAL
+           ======================================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--dark-blue);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-save {
+            padding: 10px 24px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            padding: 10px 24px;
+            background: var(--gray);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* ========================================
+           PAGINATION
+           ======================================== */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            padding: 15px;
+        }
+
+        .pagination button {
+            padding: 8px 14px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination button.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .pagination button:hover:not(.active) {
+            background: var(--light-gray);
+        }
+
+        /* ========================================
+           LOADING & EMPTY STATES
+           ======================================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+
+        .loading-overlay.show {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e9ecef;
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 400px;
+            font-family: inherit;
+        }
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-30px); } }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--gray);
+        }
+
+        /* ========================================
+           TABS & GROUPED VIEW
+           ======================================== */
+        .tabs-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            color: var(--primary-blue);
+        }
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-blue);
+            border-radius: 3px 3px 0 0;
+        }
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .dept-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+            border-right: 5px solid var(--primary-blue);
+        }
+        .dept-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .dept-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark-blue);
+        }
+        .dept-details {
+            display: none;
+            padding: 15px;
+            background: var(--light-gray);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .course-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-right: 4px solid var(--gold);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .course-card:hover {
+            background: #f8f9fa;
+        }
+        .group-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .group-students-list {
+            margin-top: 10px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1000;
+            }
+            
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-right: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                max-width: 100%;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .content-area {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name" id="userName">أحمد منصور</div>
+            <div class="user-role" id="userRole">مدير النظام</div>
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="students.html" class="nav-link active">
+                    <i class="fas fa-users"></i>
+                    <span>الطلاب</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="trainers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span>المدربين</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="schedule.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>الجدول</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>المدفوعات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>التقارير</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h2>إدارة الطلاب</h2>
+                <p>إضافة، تعديل، بحث وحذف الطلاب</p>
+            </div>
+            <div class="header-actions">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>خروج</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-btn active" data-target="allStudentsView">عرض كل الطلاب</button>
+                <button class="tab-btn" data-target="groupedStudentsView">حسب الأقسام / الجروبات</button>
+            </div>
+
+            <!-- View 1: All Students -->
+            <div id="allStudentsView" class="view-section active">
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="بحث بالاسم، الكود، أو رقم الهاتف...">
+                        <button id="searchBtn"><i class="fas fa-search"></i> بحث</button>
+                    </div>
+                    <button class="btn-add" id="addStudentBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>إضافة طالب جديد</span>
+                    </button>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <div class="filter-group">
+                        <label><i class="fas fa-building"></i> القسم:</label>
+                        <select id="deptFilter"><option value="all">الكل</option></select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-layer-group"></i> المستوى:</label>
+                        <select id="levelFilter"><option value="all">الكل</option></select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-book"></i> الكورس:</label>
+                        <select id="programFilter"><option value="all">الكل</option></select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-layer-group"></i> الجروب:</label>
+                        <select id="groupFilter">
+                            <option value="all">الكل</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Students Table -->
+                <div class="students-table-container">
+                    <table class="students-table">
+                        <thead>
+                            <tr>
+                                <th>كود الطالب</th>
+                                <th>الاسم</th>
+                                <th>الهاتف</th>
+                                <th>المدرسة/الجامعة</th>
+                                <th>العمر</th>
+                                <th>القسم</th>
+                                <th>الجروب</th>
+                                <th>تاريخ التسجيل</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentsTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center;">جاري التحميل...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination"></div>
+            </div>
+
+            <!-- View 2: Grouped Students -->
+            <div id="groupedStudentsView" class="view-section">
+                <div id="groupedStudentsContent">
+                    <!-- Dynamic Content -->
+                    <div style="text-align: center; padding: 50px; color: var(--gray);">جاري التحميل...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Student Profile Modal -->
+<div class="modal" id="profileModal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3><i class="fas fa-id-card"></i> الملف الشخصي للطالب</h3>
+            <button class="close-modal" id="closeProfileModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <!-- Basic Info Card -->
+                <div style="flex: 1; min-width: 300px; background: #f8f9fa; border-radius: 16px; padding: 20px; border: 1px solid #e9ecef;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 2px solid #dee2e6; padding-bottom: 15px;">
+                        <div style="width: 60px; height: 60px; background: var(--primary-blue); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <h3 id="profName" style="color: var(--dark-blue); margin: 0; font-size: 20px;">-</h3>
+                            <div style="color: var(--gray); font-size: 13px; margin-top: 4px;">كود: <strong id="profCode">-</strong></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+                        <div><i class="fas fa-phone" style="color: var(--gray); width: 20px;"></i> الهاتف: <strong id="profPhone">-</strong></div>
+                        <div><i class="fas fa-school" style="color: var(--gray); width: 20px;"></i> المدرسة/الجامعة: <strong id="profSchool">-</strong></div>
+                        <div><i class="fas fa-birthday-cake" style="color: var(--gray); width: 20px;"></i> العمر: <strong id="profAge">-</strong></div>
+                        <div><i class="fas fa-building" style="color: var(--gray); width: 20px;"></i> القسم: <strong id="profDept">-</strong></div>
+                        <div><i class="fas fa-users" style="color: var(--gray); width: 20px;"></i> الجروب الحالي: <strong id="profGroup">-</strong></div>
+                        <div><i class="fas fa-book" style="color: var(--gray); width: 20px;"></i> الكورس الحالي: <strong id="profCourse">-</strong></div>
+                    </div>
+                </div>
+
+                <!-- Payments & Progress Card -->
+                <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; gap: 20px;">
+                    <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <h4 style="color: var(--dark-blue); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><i class="fas fa-history"></i> السجل المالي</h4>
+                        <div style="max-height: 180px; overflow-y: auto;">
+                            <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                                <thead>
+                                    <tr style="background: var(--light-gray); color: var(--dark);">
+                                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">المستوى</th>
+                                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">المبلغ المدفوع</th>
+                                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">المتبقي</th>
+                                        <th style="padding: 8px; text-align: right; border-bottom: 1px solid #ddd;">التاريخ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="profPaymentsBody">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e9ecef; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                        <h4 style="color: var(--dark-blue); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"><i class="fas fa-plus-circle"></i> الإضافات المدفوعة (AddOns)</h4>
+                        <ul id="profAddonsList" style="list-style: none; padding: 0; margin: 0; font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Populated via JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="closeProfileBtn">إغلاق</button>
+        </div>
+    </div>
+</div>
+<!-- Add/Edit Student Modal -->
+<div class="modal" id="studentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">إضافة طالب جديد</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="studentForm">
+                <input type="hidden" id="studentId" value="">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>الاسم الكامل *</label>
+                        <input type="text" id="studentName" required placeholder="أدخل الاسم الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label>رقم الهاتف *</label>
+                        <input type="tel" id="studentPhone" required placeholder="أدخل رقم الهاتف">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>المدرسة/الجامعة</label>
+                        <input type="text" id="studentSchool" placeholder="أدخل المؤسسة التعليمية">
+                    </div>
+                    <div class="form-group">
+                        <label>العمر</label>
+                        <input type="number" id="studentAge" placeholder="العمر">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القسم *</label>
+                        <select id="studentDept" required>
+                            <option value="">اختر القسم</option>
+                            <option value="1">تقنية المعلومات (IT)</option>
+                            <option value="2">اللغات (LANG)</option>
+                            <option value="3">إدارة الأعمال (BUS)</option>
+                            <option value="4">التصميم (GD)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الجروب</label>
+                        <select id="studentGroup">
+                            <option value="">بدون جروب</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="cancelModal">إلغاء</button>
+            <button class="btn-save" id="saveStudent">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // الرابط الجديد لـ Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+    
+    let currentUser = null;
+    let allPayments = [];
+    let allCourses = [];
+    let allAddOns = [];
+    let allStudents = [];
+    let allDepartments = [];
+    let departments = [];
+    let groups = [];
+    let currentPage = 1;
+    const rowsPerPage = 10;
+
+    // Toast Notification
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // Centralized API Call
+    async function apiCall(action, data = {}) {
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...data })
+            });
+            const result = await response.json();
+            if (result.success === false) {
+                throw new Error(result.message || 'حدث خطأ غير معروف');
+            }
+            return result.data !== undefined ? result.data : result;
+        } catch (error) {
+            if (error.message && !error.message.includes('fetch')) {
+                showToast(error.message, 'error');
+            } else {
+                showToast('حدث خطأ في الاتصال بالخادم', 'error');
+            }
+            throw error;
+        }
+    }
+
+    // Form Validation
+    const Validators = {
+        required: (val) => val !== null && val !== undefined && String(val).trim() !== '',
+        phone: (val) => !val || /^[0-9]{10,15}$/.test(val.replace(/[\s\-\+]/g, '')),
+    };
+
+    function validateForm(rules) {
+        let isValid = true;
+        for (const [fieldId, checks] of Object.entries(rules)) {
+            const el = document.getElementById(fieldId);
+            if (!el) continue;
+            const val = el.value;
+            let fieldValid = true;
+            for (const check of checks) {
+                if (!check.fn(val)) {
+                    fieldValid = false;
+                    el.style.borderColor = 'var(--danger)';
+                    let errEl = el.parentElement.querySelector('.field-error');
+                    if (!errEl) {
+                        errEl = document.createElement('div');
+                        errEl.className = 'field-error';
+                        errEl.style.cssText = 'color: var(--danger); font-size: 11px; margin-top: 4px;';
+                        el.parentElement.appendChild(errEl);
+                    }
+                    errEl.textContent = check.msg;
+                    isValid = false;
+                    break;
+                }
+            }
+            if (fieldValid) {
+                el.style.borderColor = '#e9ecef';
+                const errEl = el.parentElement.querySelector('.field-error');
+                if (errEl) errEl.remove();
+            }
+        }
+        return isValid;
+    }
+
+    // ========================================
+    // GROUPED VIEW LOGIC
+    // ========================================
+    function renderGroupedView() {
+        const container = document.getElementById('groupedStudentsContent');
+        if (!container) return;
+        
+        let html = '';
+        allDepartments.forEach(dept => {
+            html += `<div class="dept-card" onclick="toggleDept('${dept.id}')">
+                <div class="dept-title"><i class="fas fa-building" style="color:var(--gold); margin-left:10px;"></i> ${dept.name}</div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dept-details" id="dept-details-${dept.id}">`;
+            
+            const deptCourses = allCourses.filter(c => String(c.deptId) === String(dept.id));
+            if (deptCourses.length === 0) {
+                html += `<p style="text-align:center; color:var(--gray);">لا يوجد كورسات في هذا القسم</p>`;
+            } else {
+                deptCourses.forEach(course => {
+                    html += `<div class="course-card" onclick="toggleCourse('${course.id}')">
+                        <div style="font-weight:600; color:var(--dark-blue);"><i class="fas fa-book" style="margin-left:8px;"></i>${course.name}</div>
+                        <div id="course-details-${course.id}" style="display:none; margin-top:10px;">`;
+                    
+                    const courseGroups = groups.filter(g => String(g.courseId) === String(course.id));
+                    if (courseGroups.length === 0) {
+                        html += `<p style="text-align:center; color:var(--gray); font-size:13px;">لا يوجد جروبات في هذا الكورس</p>`;
+                    } else {
+                        courseGroups.forEach(group => {
+                            html += `<div class="group-card">
+                                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleGroup('${group.id}')">
+                                    <span style="font-weight:600;"><i class="fas fa-users" style="margin-left:5px;"></i>${group.name}</span>
+                                    <span><i class="fas fa-chevron-down" style="font-size:12px; color:var(--gray);"></i></span>
+                                </div>
+                                <div id="group-details-${group.id}" style="display:none;" class="group-students-list">
+                                    <button class="btn-primary" style="margin-bottom:10px; padding:6px 12px; font-size:13px;" onclick="addStudentToGroup('${dept.id}', '${course.id}', '${group.id}')">
+                                        <i class="fas fa-plus"></i> إضافة طالب لهذا الجروب
+                                    </button>
+                                    <table class="data-table" style="width:100%; font-size:13px;">
+                                        <thead><tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>إجراءات</th></tr></thead>
+                                        <tbody id="tbody-group-${group.id}">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>`;
+                        });
+                    }
+                    html += `</div></div>`;
+                });
+            }
+            html += `</div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    window.toggleDept = function(id) {
+        const el = document.getElementById('dept-details-' + id);
+        if (el) el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+    };
+    window.toggleCourse = function(id) {
+        if (event) event.stopPropagation();
+        const el = document.getElementById('course-details-' + id);
+        if (el) el.style.display = el.style.display === 'none' || el.style.display === '' ? 'block' : 'none';
+    };
+    window.toggleGroup = function(id) {
+        if (event) event.stopPropagation();
+        const el = document.getElementById('group-details-' + id);
+        if (el) {
+            const isOpening = el.style.display === 'none' || el.style.display === '';
+            el.style.display = isOpening ? 'block' : 'none';
+            if (isOpening) {
+                const tbody = document.getElementById('tbody-group-' + id);
+                const groupStudents = allStudents.filter(s => String(s.groupId) === String(id));
+                if (groupStudents.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px;">لا يوجد طلاب في هذا الجروب</td></tr>';
+                } else {
+                    tbody.innerHTML = groupStudents.map(s => `<tr>
+                        <td>${s.code||'-'}</td>
+                        <td>${s.name}</td>
+                        <td>${s.phone||'-'}</td>
+                        <td><button onclick="editStudent('${s.id}')" style="border:none;background:none;color:var(--primary-blue);cursor:pointer;"><i class="fas fa-edit"></i></button></td>
+                    </tr>`).join('');
+                }
+            }
+        }
+    };
+
+    window.addStudentToGroup = function(deptId, courseId, groupId) {
+        if (event) event.stopPropagation();
+        openModal();
+        setTimeout(() => {
+            const deptSelect = document.getElementById('studentDept');
+            const groupSelect = document.getElementById('studentGroup');
+            if (deptSelect) {
+                deptSelect.value = deptId;
+                deptSelect.dispatchEvent(new Event('change'));
+                setTimeout(() => {
+                    if (groupSelect) {
+                        groupSelect.value = groupId;
+                    }
+                }, 200);
+            }
+        }, 100);
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check login
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (!userStr) {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        try {
+            currentUser = JSON.parse(userStr);
+        } catch(e) {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        updateUserUI();
+        setupEventListeners();
+        loadData();
+    });
+
+    function updateUserUI() {
+        document.getElementById('userName').textContent = currentUser.fullName || currentUser.username;
+        const roleNames = {1: 'مدير النظام', 2: 'محاسب', 3: 'مدير دور', 4: 'مسؤول حجوزات', 5: 'مشاهد'};
+        document.getElementById('userRole').textContent = roleNames[currentUser.roleId] || 'مستخدم';
+    }
+
+    function setupEventListeners() {
+        // Mobile menu toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+        
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        });
+
+        // Tabs Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.view-section').forEach(c => c.classList.remove('active'));
+                document.getElementById(this.dataset.target).classList.add('active');
+            });
+        });
+        
+        // Search
+        document.getElementById('searchBtn').addEventListener('click', () => searchStudents());
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchStudents();
+        });
+        
+        // Filters
+        const deptF = document.getElementById('deptFilter');
+        if (deptF) deptF.addEventListener('change', () => { 
+            updateLevelFilters(); 
+            filterAndRender(); 
+        });
+
+        const lvlF = document.getElementById('levelFilter');
+        if (lvlF) lvlF.addEventListener('change', () => {
+            updateProgramFilters();
+            filterAndRender();
+        });
+
+        const progF = document.getElementById('programFilter');
+        if (progF) progF.addEventListener('change', () => {
+            updateGroupFilters();
+            filterAndRender();
+        });
+        
+        const grpF = document.getElementById('groupFilter');
+        if (grpF) grpF.addEventListener('change', () => filterAndRender());
+        
+        // Modal
+        document.getElementById('addStudentBtn').addEventListener('click', () => openAddModal());
+        document.getElementById('closeModal').addEventListener('click', () => closeModal());
+        document.getElementById('cancelModal').addEventListener('click', () => closeModal());
+        document.getElementById('saveStudent').addEventListener('click', () => saveStudent());
+        
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('studentModal');
+            if (e.target === modal) closeModal();
+        });
+    }
+
+    async function loadData() {
+        showLoading(true);
+        
+        try {
+            const [sRes, gRes, pRes, cRes, aRes, dRes] = await Promise.all([
+                apiCall('getAllStudents'),
+                apiCall('getAllGroups'),
+                apiCall('getAllPayments'),
+                apiCall('getAllCourses'),
+                apiCall('getAllAddOns'),
+                apiCall('getAllDepartments')
+            ]);
+            allStudents = sRes || [];
+            groups = gRes || [];
+            allPayments = pRes || [];
+            allCourses = cRes || [];
+            allAddOns = aRes || [];
+            allDepartments = dRes || [];
+            updateDepartmentDropdowns();
+            
+            updateLevelFilters();
+            filterAndRender();
+            renderGroupedView();
+        } catch(error) {
+            console.error('Error:', error);
+            // Error handled in apiCall
+        }
+        
+        showLoading(false);
+    }
+    
+    function updateLevelFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelFilter = document.getElementById('levelFilter');
+        
+        if (levelFilter) {
+            let maxLevels = 0;
+            let filteredCourses = typeof allCourses !== 'undefined' ? allCourses : [];
+            if (deptId !== 'all' && deptId) {
+                filteredCourses = filteredCourses.filter(c => c.deptId == deptId);
+            }
+            
+            filteredCourses.forEach(c => {
+                const lvls = parseInt(c.durationLevels) || 1;
+                if (lvls > maxLevels) maxLevels = lvls;
+            });
+            
+            let levelHtml = '<option value="all">الكل</option>';
+            for (let i = 1; i <= maxLevels; i++) {
+                levelHtml += `<option value="${i}">Level ${i}</option>`;
+            }
+            levelFilter.innerHTML = levelHtml;
+            
+            // Cascade reset
+            const programFilter = document.getElementById('programFilter');
+            if (programFilter) programFilter.innerHTML = '<option value="all">الكل</option>';
+            const groupFilter = document.getElementById('groupFilter');
+            if (groupFilter) groupFilter.innerHTML = '<option value="all">الكل</option>';
+            
+            updateProgramFilters();
+        }
+    }
+
+    function updateProgramFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelId = document.getElementById('levelFilter')?.value;
+        const programFilter = document.getElementById('programFilter');
+        
+        if (programFilter) {
+            let filteredCourses = typeof allCourses !== 'undefined' ? allCourses : [];
+            
+            if (deptId !== 'all' && deptId) {
+                filteredCourses = filteredCourses.filter(c => c.deptId == deptId);
+            }
+            if (levelId !== 'all' && levelId) {
+                const lvl = parseInt(levelId);
+                filteredCourses = filteredCourses.filter(c => (parseInt(c.durationLevels) || 1) >= lvl);
+            }
+            
+            let programHtml = '<option value="all">الكل</option>';
+            filteredCourses.forEach(c => programHtml += `<option value="${c.id}">${c.courseName || c.name}</option>`);
+            programFilter.innerHTML = programHtml;
+            
+            // Cascade reset
+            const groupFilter = document.getElementById('groupFilter');
+            if (groupFilter) groupFilter.innerHTML = '<option value="all">الكل</option>';
+            
+            updateGroupFilters();
+        }
+    }
+
+    function updateGroupFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelId = document.getElementById('levelFilter')?.value;
+        const progId = document.getElementById('programFilter')?.value;
+        
+        const groupFilter = document.getElementById('groupFilter');
+        const studentGroup = document.getElementById('studentGroup');
+        
+        let filteredGroups = typeof groups !== 'undefined' ? groups : (typeof allGroups !== 'undefined' ? allGroups : []);
+        
+        if (deptId !== 'all' && deptId) filteredGroups = filteredGroups.filter(g => g.deptId == deptId);
+        if (levelId !== 'all' && levelId) filteredGroups = filteredGroups.filter(g => String(g.level) === String(levelId));
+        if (progId !== 'all' && progId) filteredGroups = filteredGroups.filter(g => g.courseId == progId);
+        
+        let options = '<option value="all">الكل</option>';
+        let modalOptions = '<option value="">بدون جروب</option>';
+        
+        filteredGroups.forEach(g => {
+            options += `<option value="${g.id}">${g.name}</option>`;
+            modalOptions += `<option value="${g.id}">${g.name}</option>`;
+        });
+        
+        if(groupFilter) groupFilter.innerHTML = options;
+        if(studentGroup) studentGroup.innerHTML = modalOptions;
+    }
+    
+    function filterAndRender() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const deptFilter = document.getElementById('deptFilter').value;
+        const levelFilter = document.getElementById('levelFilter')?.value || 'all';
+        const programFilter = document.getElementById('programFilter')?.value || 'all';
+        const groupFilter = document.getElementById('groupFilter')?.value || 'all';
+        
+        let filtered = [...allStudents];
+        
+        // Search filter
+        if (searchTerm) {
+            filtered = filtered.filter(s => 
+                s.name?.toLowerCase().includes(searchTerm) ||
+                s.code?.toLowerCase().includes(searchTerm) ||
+                s.phone?.includes(searchTerm)
+            );
+        }
+        
+        // Department filter
+        if (deptFilter !== 'all') {
+            filtered = filtered.filter(s => s.deptId == deptFilter);
+        }
+        
+        // Level filter - Students don't directly have 'level' in students table but groups do. Let's filter students by group if level or program is selected.
+        // Or we just check their assigned group's attributes if they have one.
+        if (levelFilter !== 'all' || programFilter !== 'all') {
+            filtered = filtered.filter(s => {
+                if (!s.groupId) return false;
+                const grp = allGroups.find(g => g.id == s.groupId);
+                if (!grp) return false;
+                if (levelFilter !== 'all' && String(grp.level) !== String(levelFilter)) return false;
+                if (programFilter !== 'all' && grp.courseId != programFilter) return false;
+                return true;
+            });
+        }
+        
+        // Group filter
+        if (groupFilter !== 'all') {
+            filtered = filtered.filter(s => s.groupId == groupFilter);
+        }
+        
+        renderTable(filtered);
+    }
+    
+    function searchStudents() {
+        currentPage = 1;
+        filterAndRender();
+    }
+    
+    function renderTable(students) {
+        const tbody = document.getElementById('studentsTableBody');
+        
+        if (!students || students.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">لا توجد طلاب<\/td></tr>';
+            document.getElementById('pagination').innerHTML = '';
+            return;
+        }
+        
+        // Pagination
+        const totalPages = Math.ceil(students.length / rowsPerPage);
+        const start = (currentPage - 1) * rowsPerPage;
+        const paginated = students.slice(start, start + rowsPerPage);
+        
+        // Render rows
+        tbody.innerHTML = paginated.map(s => {
+            const deptName = {1: 'IT', 2: 'LANG', 3: 'BUS', 4: 'GD'}[s.deptId] || '-';
+            const groupName = s.groupName || '-';
+            const createdDate = s.createdAt ? new Date(s.createdAt).toLocaleDateString('ar-EG') : '-';
+            
+            return `
+                <tr>
+                    <td><strong>${s.code || '-'}<\/strong></td>
+                    <td>${s.name || '-'}<\/td>
+                    <td>${s.phone || '-'}<\/td>
+                    <td>${s.school || '-'}<\/td>
+                    <td>${s.age || '-'}<\/td>
+                    <td>${deptName}<\/td>
+                    <td>${groupName}<\/td>
+                    <td>${createdDate}<\/td>
+                    <td class="action-buttons">
+                        <button class="btn-icon btn-view" onclick="viewStudent(${s.id})"><i class="fas fa-eye"></i></button>
+                        <button class="btn-icon btn-edit" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button>
+                    <\/td>
+                </tr>
+            `;
+        }).join('');
+        
+        // Render pagination
+        renderPagination(totalPages);
+    }
+    
+    function renderPagination(totalPages) {
+        const container = document.getElementById('pagination');
+        if (totalPages <= 1) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+        container.innerHTML = html;
+    }
+    
+    function goToPage(page) {
+        currentPage = page;
+        filterAndRender();
+    }
+    
+    function viewStudent(id) {
+        window.open(`student_profile.html?id=${id}`, '_blank');
+    }
+
+    
+    function editStudent(id) {
+        const student = allStudents.find(s => s.id == id);
+        if (student) {
+            document.getElementById('modalTitle').textContent = 'تعديل بيانات الطالب';
+            document.getElementById('studentId').value = student.id;
+            document.getElementById('studentName').value = student.name || '';
+            document.getElementById('studentPhone').value = student.phone || '';
+            document.getElementById('studentSchool').value = student.school || '';
+            document.getElementById('studentAge').value = student.age || '';
+            document.getElementById('studentDept').value = student.deptId || '';
+            document.getElementById('studentGroup').value = student.groupId || '';
+            document.getElementById('studentModal').classList.add('show');
+        }
+    }
+    
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'إضافة طالب جديد';
+        document.getElementById('studentForm').reset();
+        document.getElementById('studentId').value = '';
+        document.getElementById('studentModal').classList.add('show');
+    }
+    
+    function closeModal() {
+        document.getElementById('studentModal').classList.remove('show');
+    }
+    
+    async function saveStudent() {
+        const rules = {
+            studentName: [{ fn: Validators.required, msg: 'الاسم مطلوب' }],
+            studentPhone: [
+                { fn: Validators.required, msg: 'رقم الهاتف مطلوب' },
+                { fn: Validators.phone, msg: 'رقم الهاتف غير صالح' }
+            ],
+            studentDept: [{ fn: Validators.required, msg: 'القسم مطلوب' }]
+        };
+        
+        if (!validateForm(rules)) return;
+        
+        const studentData = {
+            id: document.getElementById('studentId').value || null,
+            name: document.getElementById('studentName').value,
+            phone: document.getElementById('studentPhone').value,
+            school: document.getElementById('studentSchool').value,
+            age: parseInt(document.getElementById('studentAge').value, 10) || null,
+            deptId: parseInt(document.getElementById('studentDept').value, 10) || null,
+            groupId: parseInt(document.getElementById('studentGroup').value, 10) || null
+        };
+        
+        showLoading(true);
+        try {
+            await apiCall('saveStudent', studentData);
+            showToast('تم حفظ بيانات الطالب بنجاح', 'success');
+            closeModal();
+            loadData();
+        } catch (error) {
+            // Error handled in apiCall
+        }
+        showLoading(false);
+    }
+    
+    async function deleteStudent(id) {
+        if (confirm('هل أنت متأكد من حذف هذا الطالب؟')) {
+            showLoading(true);
+            try {
+                await apiCall('deleteStudent', { studentId: id });
+                showToast('تم حذف الطالب بنجاح', 'success');
+                loadData();
+            } catch (error) {
+                // Error handled in apiCall
+            }
+            showLoading(false);
+        }
+    }
+    
+    function showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) overlay.classList.add('show');
+        else overlay.classList.remove('show');
+    }
+    
+    // Make functions global for onclick
+    window.viewStudent = viewStudent;
+    
+    function viewProfile(id) {
+        window.location.href = 'student_profile.html?id=' + id;
+    }
+    
+    window.viewProfile = viewProfile;
+window.editStudent = editStudent;
+    window.deleteStudent = deleteStudent;
+    window.goToPage = goToPage;
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>

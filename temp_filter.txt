@@ -1,0 +1,134 @@
+﻿function filterAndRender() {
+        const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+        const deptFilterVal = document.getElementById('deptFilter')?.value || 'all';
+        const levelFilterVal = document.getElementById('levelFilter')?.value || 'all';
+        const programFilterVal = document.getElementById('programFilter')?.value || 'all';
+        const groupFilterVal = document.getElementById('groupFilter')?.value || 'all';
+
+        // Group by student + level + type
+        const grouped = {};
+        allPayments.forEach(p => {
+            const key = `${p.studentId}__${p.levelNumber}__${p.paymentType}`;
+            if (!grouped[key]) {
+                grouped[key] = { ...p, allAmounts: [], totalPaid: 0, totalDiscount: 0 };
+            }
+            grouped[key].allAmounts.push({
+                amount: parseFloat(p.amountPaid) || 0,
+                date: p.paymentDate,
+                id: p.id,
+                receipt: p.receipt_number || p.receiptNumber || '-'
+            });
+            grouped[key].totalPaid += parseFloat(p.amountPaid) || 0;
+            grouped[key].totalDiscount += parseFloat(p.discountAmount) || 0;
+            // Always use latest remaining balance
+            if (!grouped[key]._lastId || p.id >= grouped[key]._lastId) {
+                grouped[key]._lastId = p.id;
+                grouped[key].remainingBalance = parseFloat(p.remainingBalance) || 0;
+                grouped[key].totalLevelFee = parseFloat(p.totalLevelFee) || parseFloat(p.totalFee) || 0;
+            }
+        });
+
+        // Add students who haven't paid anything yet for the target level
+        if (typeof allStudents !== 'undefined' && typeof allGroups !== 'undefined' && typeof allCourses !== 'undefined') {
+            const targetLevel = levelFilterVal === 'all' ? '1' : levelFilterVal;
+            allStudents.forEach(s => {
+                if (s.groupId) {
+                    const group = allGroups.find(g => String(g.id) === String(s.groupId));
+                    if (group) {
+                        const course = allCourses.find(c => String(c.id) === String(group.courseId));
+                        if (course) {
+                            const durationLevels = parseInt(course.durationLevels) || 1;
+                            // Only add debt if the target level is within the course's duration
+                            if (parseInt(targetLevel) <= durationLevels) {
+                                // Check if student has ANY payment for this specific target level
+                                const hasPayment = Object.values(grouped).some(p => String(p.studentId) === String(s.id) && String(p.levelNumber) === String(targetLevel));
+                                
+                                if (!hasPayment) {
+                                    const coursePrice = parseFloat(course.pricePerLevel) || 0;
+                                    
+                                    const key = `${s.id}__${targetLevel}__Unpaid`;
+                                    grouped[key] = {
+                                        studentId: s.id,
+                                        studentName: s.name,
+                                        levelNumber: targetLevel,
+                                        paymentType: '-',
+                                        paymentDate: s.createdAt || new Date().toISOString(),
+                                        amountPaid: 0,
+                                        remainingBalance: coursePrice,
+                                        totalLevelFee: coursePrice,
+                                        totalDiscount: 0,
+                                        allAmounts: []
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let rows = Object.values(grouped);
+
+        // Search
+        if (searchTerm) {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                const name = (p.studentName || s?.name || '').toLowerCase();
+                const code = (s?.code || '').toLowerCase();
+                return name.includes(searchTerm) || code.includes(searchTerm);
+            });
+        }
+
+        // Dept filter
+        if (deptFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                return s && String(s.deptId) === String(deptFilterVal);
+            });
+        }
+
+        // Level filter
+        if (levelFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                if (!s || !s.groupId) return false;
+                const g = allGroups.find(gr => String(gr.id) === String(s.groupId));
+                return g && String(g.level) === String(levelFilterVal);
+            });
+        }
+
+        // Program filter
+        if (programFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                if (!s || !s.groupId) return false;
+                const g = allGroups.find(gr => String(gr.id) === String(s.groupId));
+                return g && String(g.courseId) === String(programFilterVal);
+            });
+        }
+
+        // Group filter
+        if (groupFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                return s && String(s.groupId) === String(groupFilterVal);
+            });
+        }
+
+        // Status filter
+        if (statusFilter === 'paid') {
+            rows = rows.filter(p => p.totalPaid > 0 && parseFloat(p.remainingBalance) === 0);
+        } else if (statusFilter === 'partial') {
+            rows = rows.filter(p => p.totalPaid > 0 && parseFloat(p.remainingBalance) > 0);
+        } else if (statusFilter === 'unpaid') {
+            rows = rows.filter(p => p.totalPaid <= 0);
+        }
+
+        renderTable(rows);
+    }
+
+    function renderTable(rows) {
+        const tbody = document.getElementById('paymentsTableBody');
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML

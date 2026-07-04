@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | جدول الحجوزات</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FullCalendar -->
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/locales/ar.js'></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #1a2a6c;
+            --medium-blue: #2a4a9c;
+            --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0;
+            --gold: #f4a261;
+            --gold-dark: #e76f51;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --gray: #6c757d;
+            --dark: #1e2a3e;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --sidebar-width: 270px;
+            --header-height: 65px;
+        }
+
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .sidebar-logo .logo-icon i { font-size: 28px; color: var(--gold); }
+        .sidebar-logo h3 { font-size: 18px; margin-bottom: 3px; }
+        .sidebar-logo p { font-size: 10px; opacity: 0.7; }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .user-avatar i { font-size: 24px; color: var(--dark-blue); }
+        .user-name { font-weight: 700; font-size: 14px; }
+        .user-role { font-size: 11px; color: var(--gold); margin-top: 5px; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-link.active { background: var(--gold); color: var(--dark-blue); font-weight: 600; }
+        .nav-link i { width: 22px; text-align: center; font-size: 16px; }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 0 25px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h2 { font-size: 20px; font-weight: 700; color: var(--dark-blue); }
+        .page-title p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-btn:hover { background: #fdecea; }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .content-area { padding: 25px; }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--white);
+            padding: 8px;
+            border-radius: 16px;
+            display: inline-flex;
+        }
+        .view-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .view-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+        .btn-filter {
+            padding: 8px 20px;
+            background: var(--gold);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn-add-booking {
+            padding: 8px 20px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Calendar Container */
+        .calendar-container {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        /* Weekly Grid View */
+        .weekly-grid {
+            background: var(--white);
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .weekly-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+        .weekly-table th {
+            text-align: center;
+            padding: 15px;
+            background: var(--dark-blue);
+            color: white;
+            font-weight: 600;
+        }
+        .weekly-table td {
+            border: 1px solid #e9ecef;
+            padding: 8px;
+            vertical-align: top;
+            min-width: 120px;
+            height: 100px;
+        }
+        .booking-slot {
+            background: var(--light-gray);
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-right: 3px solid var(--gold);
+        }
+        .booking-slot:hover {
+            transform: translateX(-3px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .booking-time {
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+        .booking-trainer {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--dark-blue);
+        }
+        .booking-group {
+            font-size: 10px;
+            color: var(--gray);
+        }
+        .booking-hall {
+            font-size: 10px;
+            color: var(--info);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--white);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 550px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { color: var(--dark-blue); }
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        .modal-body { padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--dark);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn-save {
+            padding: 10px 24px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-cancel {
+            padding: 10px 24px;
+            background: var(--gray);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-delete {
+            padding: 10px 24px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e9ecef;
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 400px;
+            font-family: inherit;
+        }
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-30px); } }
+
+        /* Conflict indicator */
+        .conflict {
+            background: #fdecea;
+            border-right-color: var(--danger);
+        }
+        .conflict .booking-time { color: var(--danger); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1000;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+            .menu-toggle { display: block; }
+            .content-area { padding: 15px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name" id="userName"></div>
+            <div class="user-role" id="userRole"></div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>الطلاب</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="trainers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span>المدربين</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="schedule.html" class="nav-link active">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>الجدول</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>المدفوعات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    <span>التقارير</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            <div class="page-title">
+                <h2>جدول الحجوزات</h2>
+                <p>إدارة حجوزات القاعات والمدربين</p>
+            </div>
+            <div class="header-actions">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>خروج</span></button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Filter Bar -->
+            <div class="filter-bar" style="display: flex; gap: 15px; background: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: flex-end; flex-wrap: wrap;">
+                
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-layer-group"></i> الدور</label>
+                    <select id="floorFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">كل الأدوار</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-door-open"></i> القاعة</label>
+                    <select id="hallFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">كل القاعات</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-chalkboard-user"></i> المدرب</label>
+                    <select id="trainerFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">كل المدربين</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-building"></i> القسم</label>
+                    <select id="deptFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">كل الأقسام</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-layer-group"></i> المستوى</label>
+                    <select id="levelFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">الكل</option>
+                        <option value="1">Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                        <option value="5">Level 5</option>
+                        <option value="6">Level 6</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-book"></i> البرنامج</label>
+                    <select id="programFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group" style="flex: 1; min-width: 150px;">
+                    <label style="display: block; margin-bottom: 8px; color: var(--gray); font-size: 13px;"><i class="fas fa-users-viewfinder"></i> الجروب</label>
+                    <select id="groupFilter" style="width: 100%; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px;">
+                        <option value="all">الكل</option>
+                    </select>
+                </div>
+                <button id="applyFilterBtn" style="padding: 12px 24px; background: var(--primary-blue); color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold;"><i class="fas fa-filter"></i> تطبيق التصفية</button>
+                <button id="addBookingBtn" style="padding: 12px 24px; background: var(--success); color: white; border: none; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: bold; margin-right: auto;"><i class="fas fa-plus"></i> حجز جديد</button>
+            </div>
+
+            <!-- Board View -->
+            <div class="board-container" style="background: white; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 1000px;" id="scheduleBoard">
+                    <thead id="boardHeader">
+                        <!-- Headers injected via JS -->
+                    </thead>
+                    <tbody id="boardBody">
+                        <!-- Rows injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<!-- Booking Modal -->
+<div class="modal" id="bookingModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">حجز جديد</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="bookingForm">
+                <input type="hidden" id="bookingId">
+                
+                <div class="form-group">
+                    <label>الأيام</label>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <label><input type="checkbox" name="bookingDays" value="Saturday"> السبت</label>
+                        <label><input type="checkbox" name="bookingDays" value="Sunday"> الأحد</label>
+                        <label><input type="checkbox" name="bookingDays" value="Monday"> الاثنين</label>
+                        <label><input type="checkbox" name="bookingDays" value="Tuesday"> الثلاثاء</label>
+                        <label><input type="checkbox" name="bookingDays" value="Wednesday"> الأربعاء</label>
+                        <label><input type="checkbox" name="bookingDays" value="Thursday"> الخميس</label>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>من الساعة</label>
+                        <select id="startTime" required style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                            <option value="">اختر وقت البداية...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>إلى الساعة</label>
+                        <select id="endTime" required style="width:100%;padding:10px 12px;border:2px solid #e9ecef;border-radius:10px;font-family:inherit;">
+                            <option value="">اختر وقت النهاية...</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>القاعة</label>
+                    <select id="hallId" required></select>
+                </div>
+                <div class="form-group">
+                    <label>المدرب</label>
+                    <select id="trainerId" required></select>
+                </div>
+                <div class="form-group">
+                    <label>الجروب</label>
+                    <select id="groupId">
+                        <option value="">بدون جروب</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="cancelModal">إلغاء</button>
+            <button class="btn-delete" id="deleteBookingBtn" style="display: none;">حذف</button>
+            <button class="btn-save" id="saveBooking">حفظ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+    
+    let currentUser = null;
+    let allBookings = [];
+    let allHalls = [];
+    let allTrainers = [];
+    let allGroups = [];
+    let allFloors = [];
+    let allDepartments = [];
+
+    const daysOfWeek = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday'];
+    const daysNames = { Saturday:'السبت', Sunday:'الأحد', Monday:'الاثنين', Tuesday:'الثلاثاء', Wednesday:'الأربعاء', Thursday:'الخميس' };
+
+    // Time slots 9 AM to 10 PM with 30-min intervals
+    const timeSlots = [];
+    for (let i = 9; i <= 22; i++) {
+        for (let m of [0, 30]) {
+            if (i === 22 && m === 30) continue;
+            const h12 = i > 12 ? i - 12 : i;
+            const suffix = i >= 12 ? 'م' : 'ص';
+            const minStr = m === 0 ? '00' : '30';
+            timeSlots.push({
+                time24: `${String(i).padStart(2,'0')}:${minStr}`,
+                display: `${h12}:${minStr} ${suffix}`
+            });
+        }
+    }
+    // Board only shows full hours
+    const boardSlots = timeSlots.filter(s => s.time24.endsWith(':00'));
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    function showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) overlay.classList.add('show');
+        else overlay.classList.remove('show');
+    }
+
+    async function apiCall(action, data = {}) {
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...data })
+            });
+            const result = await response.json();
+            if (result.success === false) throw new Error(result.message || 'خطأ');
+            return result.data !== undefined ? result.data : result;
+        } catch (error) {
+            showToast(error.message || 'خطأ في الاتصال', 'error');
+            throw error;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (!userStr) { window.location.href = 'index.html'; return; }
+        try { currentUser = JSON.parse(userStr); } catch(e) { window.location.href = 'index.html'; return; }
+        
+        document.getElementById('userName').textContent = currentUser.fullName || currentUser.username;
+        const roleNames = {1:'مدير النظام',2:'محاسب',3:'مدير دور',4:'مسؤول حجوزات',5:'مشاهد'};
+        document.getElementById('userRole').textContent = roleNames[currentUser.roleId] || 'مستخدم';
+
+        // Populate time dropdowns
+        const startSel = document.getElementById('startTime');
+        const endSel = document.getElementById('endTime');
+        timeSlots.forEach(s => {
+            startSel.innerHTML += `<option value="${s.time24}">${s.display}</option>`;
+            endSel.innerHTML += `<option value="${s.time24}">${s.display}</option>`;
+        });
+
+        document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+        document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'index.html'; });
+        document.getElementById('applyFilterBtn').addEventListener('click', () => renderBoard());
+        document.getElementById('addBookingBtn').addEventListener('click', () => openAddModal());
+        document.getElementById('closeModal').addEventListener('click', () => closeModal());
+        document.getElementById('cancelModal').addEventListener('click', () => closeModal());
+        document.getElementById('saveBooking').addEventListener('click', () => saveBooking());
+        document.getElementById('deleteBookingBtn').addEventListener('click', () => deleteBooking());
+        window.addEventListener('click', e => { if(e.target === document.getElementById('bookingModal')) closeModal(); });
+
+        loadData();
+    });
+
+    async function loadData() {
+        showLoading(true);
+        try {
+            const [bRes, hRes, tRes, gRes, fRes, dRes, cRes] = await Promise.all([
+                apiCall('getAllBookings'),
+                apiCall('getAllHalls'),
+                apiCall('getAllTrainers'),
+                apiCall('getAllGroups'),
+                apiCall('getAllFloors'),
+                apiCall('getAllDepartments'),
+                apiCall('getAllCourses')
+            ]);
+            allBookings = bRes || [];
+            allHalls = hRes || [];
+            allTrainers = tRes || [];
+            allGroups = gRes || [];
+            allFloors = fRes || [];
+            allDepartments = dRes || [];
+            allCourses = cRes || [];
+            
+            populateFilters();
+            setupFilterListeners();
+            renderBoard();
+        } catch(e) { 
+            console.error(e); 
+            showToast('خطأ أثناء التحميل: ' + e.message, 'error');
+            document.getElementById('boardBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:red;padding:20px;">حدث خطأ: ' + e.message + '<br><small>تأكد من عمل Deploy للـ Script الجديد.</small></td></tr>';
+        }
+        showLoading(false);
+    }
+
+    function populateFilters() {
+        const hallFilter = document.getElementById('hallFilter');
+        const trainerFilter = document.getElementById('trainerFilter');
+        const floorFilter = document.getElementById('floorFilter');
+        const deptFilter = document.getElementById('deptFilter');
+        const hallSelect = document.getElementById('hallId');
+        const trainerSelect = document.getElementById('trainerId');
+        const groupSelect = document.getElementById('groupId');
+
+        hallFilter.innerHTML = '<option value="all">كل القاعات</option>';
+        allHalls.forEach(h => hallFilter.innerHTML += `<option value="${h.id}">${h.name}</option>`);
+
+        trainerFilter.innerHTML = '<option value="all">كل المدربين</option>';
+        allTrainers.forEach(t => trainerFilter.innerHTML += `<option value="${t.id}">${t.name}</option>`);
+
+        if (floorFilter) {
+            floorFilter.innerHTML = '<option value="all">كل الأدوار</option>';
+            allFloors.forEach(f => floorFilter.innerHTML += `<option value="${f.id}">${f.name}</option>`);
+        }
+        if (deptFilter) {
+            deptFilter.innerHTML = '<option value="all">كل الأقسام</option>';
+            allDepartments.forEach(d => deptFilter.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+        }
+
+        hallSelect.innerHTML = '<option value="">اختر القاعة...</option>';
+        allHalls.forEach(h => {
+            const floor = allFloors.find(f => f.id == h.floorNumber);
+            hallSelect.innerHTML += `<option value="${h.id}">${h.name}${floor ? ' - ' + floor.name : ''}</option>`;
+        });
+
+        trainerSelect.innerHTML = '<option value="">اختر المدرب...</option>';
+        allTrainers.forEach(t => trainerSelect.innerHTML += `<option value="${t.id}">${t.name}</option>`);
+
+        groupSelect.innerHTML = '<option value="">بدون جروب</option>';
+        allGroups.forEach(g => groupSelect.innerHTML += `<option value="${g.id}">${g.name}</option>`);
+        
+        updateCascadingFilters();
+    }
+
+    function setupFilterListeners() {
+        document.getElementById('deptFilter')?.addEventListener('change', () => { updateCascadingFilters(); renderBoard(); });
+        document.getElementById('levelFilter')?.addEventListener('change', () => { updateCascadingFilters(); renderBoard(); });
+        document.getElementById('programFilter')?.addEventListener('change', () => { updateCascadingFilters(); renderBoard(); });
+        document.getElementById('groupFilter')?.addEventListener('change', renderBoard);
+        document.getElementById('floorFilter')?.addEventListener('change', renderBoard);
+        document.getElementById('hallFilter')?.addEventListener('change', renderBoard);
+        document.getElementById('trainerFilter')?.addEventListener('change', renderBoard);
+    }
+
+    function updateCascadingFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelId = document.getElementById('levelFilter')?.value;
+        const programFilter = document.getElementById('programFilter');
+        const groupFilter = document.getElementById('groupFilter');
+        
+        // Update Programs
+        if (programFilter) {
+            let filteredCourses = typeof allCourses !== 'undefined' ? allCourses : [];
+            if (deptId !== 'all' && deptId) {
+                filteredCourses = filteredCourses.filter(c => c.deptId == deptId);
+            }
+            let programHtml = '<option value="all">الكل</option>';
+            filteredCourses.forEach(c => programHtml += `<option value="${c.id}">${c.courseName || c.name}</option>`);
+            programFilter.innerHTML = programHtml;
+        }
+
+        // Update Groups
+        if (groupFilter) {
+            const progId = programFilter ? programFilter.value : 'all';
+            let filteredGroups = typeof allGroups !== 'undefined' ? allGroups : [];
+            if (deptId !== 'all' && deptId) filteredGroups = filteredGroups.filter(g => g.deptId == deptId);
+            if (levelId !== 'all' && levelId) filteredGroups = filteredGroups.filter(g => String(g.level) === String(levelId));
+            if (progId !== 'all' && progId) filteredGroups = filteredGroups.filter(g => g.courseId == progId);
+            
+            let groupHtml = '<option value="all">الكل</option>';
+            filteredGroups.forEach(g => groupHtml += `<option value="${g.id}">${g.name}</option>`);
+            groupFilter.innerHTML = groupHtml;
+        }
+    }
+
+    function normalizeTime(t) {
+        if (!t) return '00:00';
+        if (t.includes('T')) {
+            const d = new Date(t);
+            return String(d.getUTCHours()).padStart(2,'0') + ':' + String(d.getUTCMinutes()).padStart(2,'0');
+        }
+        return t;
+    }
+
+    function formatTimeAr(timeStr) {
+        if (!timeStr) return '';
+        let [h, m] = timeStr.split(':');
+        h = parseInt(h);
+        const ampm = h >= 12 ? 'م' : 'ص';
+        h = h % 12;
+        h = h ? h : 12;
+        return `${String(h).padStart(2,'0')}:${m} ${ampm}`;
+    }
+
+    function renderBoard() {
+        const hallFilter = document.getElementById('hallFilter')?.value || 'all';
+        const trainerFilter = document.getElementById('trainerFilter')?.value || 'all';
+        const floorFilter = document.getElementById('floorFilter')?.value || 'all';
+        const deptFilter = document.getElementById('deptFilter')?.value || 'all';
+        const levelFilter = document.getElementById('levelFilter')?.value || 'all';
+        const programFilter = document.getElementById('programFilter')?.value || 'all';
+        const groupFilter = document.getElementById('groupFilter')?.value || 'all';
+
+        let filteredBookings = [...allBookings];
+        if (hallFilter !== 'all') filteredBookings = filteredBookings.filter(b => b.hallId == hallFilter);
+        if (trainerFilter !== 'all') filteredBookings = filteredBookings.filter(b => b.trainerId == trainerFilter);
+        
+        // Filter by Floor (Hall's floor)
+        if (floorFilter !== 'all') {
+            filteredBookings = filteredBookings.filter(b => {
+                const hall = allHalls.find(h => h.id == b.hallId);
+                return hall && String(hall.floorNumber) === String(floorFilter);
+            });
+        }
+
+        // Filter by Group attributes
+        if (groupFilter !== 'all') {
+            filteredBookings = filteredBookings.filter(b => String(b.groupId) === String(groupFilter));
+        } else {
+            if (deptFilter !== 'all' || levelFilter !== 'all' || programFilter !== 'all') {
+                filteredBookings = filteredBookings.filter(b => {
+                    if (!b.groupId) return false;
+                    const group = allGroups.find(g => g.id == b.groupId);
+                    if (!group) return false;
+                    if (deptFilter !== 'all' && String(group.deptId) !== String(deptFilter)) return false;
+                    if (levelFilter !== 'all' && String(group.level) !== String(levelFilter)) return false;
+                    if (programFilter !== 'all' && String(group.courseId) !== String(programFilter)) return false;
+                    return true;
+                });
+            }
+        }
+
+        const header = document.getElementById('boardHeader');
+        const body = document.getElementById('boardBody');
+
+        // Header - full hours for display
+        let headerHtml = '<tr><th style="padding:15px;background:var(--dark-blue);color:white;border:1px solid #334;width:120px;position:sticky;right:0;z-index:10;">اليوم / الوقت</th>';
+        for (const slot of boardSlots) {
+            headerHtml += `<th style="padding:10px;background:var(--dark-blue);color:white;border:1px solid #334;text-align:center;min-width:160px;font-size:13px;">${slot.display}</th>`;
+        }
+        headerHtml += '</tr>';
+        header.innerHTML = headerHtml;
+
+        const floorColors = ['#e3f2fd','#fce4ec','#e8f5e9','#fff3e0','#f3e5f5','#e8eaf6'];
+        const floorBorderColors = ['#1565c0','#c62828','#2e7d32','#e65100','#6a1b9a','#283593'];
+
+        let bodyHtml = '';
+        for (const day of daysOfWeek) {
+            let rowHtml = `<tr>
+                <td style="padding:12px;background:linear-gradient(135deg,#f8f9fa,#e9ecef);border:1px solid #dee2e6;text-align:center;position:sticky;right:0;z-index:9;min-width:100px;">
+                    <div style="color:var(--dark-blue);font-weight:800;font-size:15px;">${daysNames[day]}</div>
+                    <button onclick="openAddModalAtDay('${day}')" style="margin-top:6px;background:transparent;border:1px dashed #aaa;color:#777;padding:3px 8px;width:100%;border-radius:6px;cursor:pointer;font-size:11px;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--primary-blue)'" onmouseout="this.style.borderColor='#aaa'">
+                        <i class="fas fa-plus"></i> حجز
+                    </button>
+                </td>`;
+            
+            for (const slot of boardSlots) {
+                const time = slot.time24;
+                let cellContent = '';
+
+                // Check bookings that fall in this hour slot
+                for (let i = 0; i < allFloors.length; i++) {
+                    const floor = allFloors[i];
+                    const floorColor = floorColors[i % floorColors.length];
+                    const borderColor = floorBorderColors[i % floorBorderColors.length];
+
+                    const floorBookings = filteredBookings.filter(b => {
+                        const hall = allHalls.find(h => h.id == b.hallId);
+                        // hall.floorNumber is the field from code.gs
+                        if (!hall || hall.floorNumber != floor.id) return false;
+                        const bookingDays = b.days || (b.day ? [b.day] : []);
+                        if (!bookingDays.includes(day)) return false;
+                        // Check time overlap: booking covers this hour slot
+                        return normalizeTime(b.startTime) <= time && normalizeTime(b.endTime) > time;
+                    });
+
+                    if (floorBookings.length > 0) {
+                        cellContent += `<div style="background:${floorColor};border-right:4px solid ${borderColor};padding:7px 8px;margin-bottom:5px;border-radius:8px;font-size:11px;box-shadow:0 2px 4px rgba(0,0,0,0.08);">
+                            <div style="font-weight:800;color:${borderColor};margin-bottom:4px;border-bottom:1px solid rgba(0,0,0,0.08);padding-bottom:3px;">
+                                <i class="fas fa-layer-group"></i> ${floor.name}
+                            </div>`;
+                        for (const b of floorBookings) {
+                            const trainer = allTrainers.find(t => t.id == b.trainerId);
+                            const hall = allHalls.find(h => h.id == b.hallId);
+                            const group = allGroups.find(g => g.id == b.groupId);
+                            const dept = trainer ? allDepartments.find(d => d.id == trainer.deptId) : null;
+                            cellContent += `<div onclick="editBooking(${b.id})" style="cursor:pointer;background:rgba(255,255,255,0.95);padding:8px;margin-top:5px;border-radius:8px;transition:all 0.2s;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 3px rgba(0,0,0,0.05);" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 1px 3px rgba(0,0,0,0.05)'">
+                                <div style="display:flex;justify-content:center;align-items:center;background:#f0f4ff;padding:4px 6px;border-radius:6px;margin-bottom:6px;color:var(--primary-blue);font-weight:800;font-size:11px;border:1px dashed rgba(26,42,108,0.2);">
+                                    <i class="fas fa-clock" style="margin-left:4px;"></i> 
+                                    <span dir="ltr">${formatTimeAr(b.startTime)} - ${formatTimeAr(b.endTime)}</span>
+                                </div>
+                                <div style="color:#333;margin-bottom:3px;font-size:11px;"><i class="fas fa-door-open" style="color:${borderColor};width:16px;"></i> <strong>${hall?.name || '-'}</strong>${hall ? ' <span style="color:#888;font-size:9px;">(سعة: '+hall.capacity+')</span>' : ''}</div>
+                                <div style="color:#333;margin-bottom:3px;font-size:11px;"><i class="fas fa-user-tie" style="color:${borderColor};width:16px;"></i> ${trainer?.name || '-'}</div>
+                                ${dept ? `<div style="color:#666;font-size:10px;"><i class="fas fa-building" style="width:16px;"></i> ${dept.name}</div>` : ''}
+                                ${group ? `<div style="color:#666;font-size:10px;"><i class="fas fa-users" style="width:16px;"></i> ${group.name}</div>` : ''}
+                            </div>`;
+                        }
+                        cellContent += '</div>';
+                    }
+                }
+
+                const isEmpty = !cellContent;
+                rowHtml += `<td style="padding:8px;border:1px solid #e8eaf0;vertical-align:top;background:${isEmpty ? 'white' : '#fafbff'};min-height:80px;transition:background 0.2s;" onmouseover="if(!this.querySelector('div')) this.style.background='#f0f4ff'" onmouseout="this.style.background=''">
+                    ${cellContent || '<div style="height:40px;"></div>'}
+                </td>`;
+            }
+            rowHtml += '</tr>';
+            bodyHtml += rowHtml;
+        }
+        body.innerHTML = bodyHtml;
+    }
+
+    function openAddModal() {
+        document.getElementById('modalTitle').textContent = 'حجز جديد';
+        document.getElementById('bookingId').value = '';
+        document.querySelectorAll('input[name="bookingDays"]').forEach(cb => cb.checked = false);
+        document.getElementById('startTime').value = '';
+        document.getElementById('endTime').value = '';
+        document.getElementById('hallId').value = '';
+        document.getElementById('trainerId').value = '';
+        document.getElementById('groupId').value = '';
+        document.getElementById('deleteBookingBtn').style.display = 'none';
+        document.getElementById('bookingModal').classList.add('show');
+    }
+
+    window.openAddModalAtDay = function(day) {
+        openAddModal();
+        const cb = document.querySelector(`input[name="bookingDays"][value="${day}"]`);
+        if (cb) cb.checked = true;
+    };
+
+    function closeModal() {
+        document.getElementById('bookingModal').classList.remove('show');
+    }
+
+    window.editBooking = function(id) {
+        const b = allBookings.find(x => x.id == id);
+        if (!b) return;
+        document.getElementById('modalTitle').textContent = 'تعديل الحجز';
+        document.getElementById('bookingId').value = b.id;
+        document.querySelectorAll('input[name="bookingDays"]').forEach(cb => cb.checked = false);
+        const bookingDays = b.days || (b.day ? [b.day] : []);
+        bookingDays.forEach(d => {
+            const cb = document.querySelector(`input[name="bookingDays"][value="${d}"]`);
+            if (cb) cb.checked = true;
+        });
+        document.getElementById('startTime').value = b.startTime;
+        document.getElementById('endTime').value = b.endTime;
+        document.getElementById('hallId').value = b.hallId;
+        document.getElementById('trainerId').value = b.trainerId;
+        document.getElementById('groupId').value = b.groupId || '';
+        document.getElementById('deleteBookingBtn').style.display = 'block';
+        document.getElementById('bookingModal').classList.add('show');
+    };
+
+    async function saveBooking() {
+        const days = Array.from(document.querySelectorAll('input[name="bookingDays"]:checked')).map(cb => cb.value);
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        const hallId = document.getElementById('hallId').value;
+        const trainerId = document.getElementById('trainerId').value;
+        const groupId = document.getElementById('groupId').value;
+        const id = document.getElementById('bookingId').value;
+
+        if (!days.length) { showToast('يرجى اختيار يوم واحد على الأقل', 'warning'); return; }
+        if (!startTime) { showToast('يرجى اختيار وقت البداية', 'warning'); return; }
+        if (!endTime) { showToast('يرجى اختيار وقت النهاية', 'warning'); return; }
+        if (!hallId) { showToast('يرجى اختيار القاعة', 'warning'); return; }
+        if (!trainerId) { showToast('يرجى اختيار المدرب', 'warning'); return; }
+        if (startTime >= endTime) { showToast('وقت النهاية يجب أن يكون بعد وقت البداية', 'warning'); return; }
+
+        const bookingData = { id: id || undefined, days, startTime, endTime, hallId, trainerId, groupId, createdBy: currentUser.id };
+        
+        showLoading(true);
+        try {
+            const res = await apiCall('saveBooking', { bookingData });
+            const isSuccess = res && res.success !== false;
+            showToast(res.message || (isSuccess ? 'تم الحفظ بنجاح' : 'حدث خطأ'), isSuccess ? 'success' : 'error');
+            if (isSuccess) { closeModal(); loadData(); }
+        } catch(e) {}
+        showLoading(false);
+    }
+
+    async function deleteBooking() {
+        const id = document.getElementById('bookingId').value;
+        if (!id || !confirm('هل أنت متأكد من حذف هذا الحجز؟')) return;
+        showLoading(true);
+        try {
+            await apiCall('deleteBooking', { bookingId: id });
+            showToast('تم الحذف بنجاح', 'success');
+            closeModal();
+            loadData();
+        } catch(e) {}
+        showLoading(false);
+    }
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>

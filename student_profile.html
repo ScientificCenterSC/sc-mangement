@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | ملف الطالب</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #1a2a6c;
+            --medium-blue: #2a4a9c;
+            --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0;
+            --gold: #f4a261;
+            --gold-dark: #e76f51;
+            --white: #ffffff;
+            --light-gray: #f0f2f8;
+            --gray: #6c757d;
+            --dark: #1e2a3e;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --sidebar-width: 270px;
+            --header-height: 65px;
+        }
+
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        /* ========================================
+           APP CONTAINER
+           ======================================== */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ========================================
+           SIDEBAR
+           ======================================== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .sidebar-logo .logo-icon i { font-size: 28px; color: var(--gold); }
+        .sidebar-logo h3 { font-size: 18px; margin-bottom: 3px; }
+        .sidebar-logo p { font-size: 10px; opacity: 0.7; letter-spacing: 1px; }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .user-avatar i { font-size: 24px; color: var(--dark-blue); }
+        .user-name { font-weight: 700; font-size: 14px; }
+        .user-role { font-size: 11px; color: var(--gold); margin-top: 5px; }
+
+        .nav-menu { list-style: none; padding: 0 15px; }
+        .nav-item { margin-bottom: 5px; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-link.active { background: var(--gold); color: var(--dark-blue); font-weight: 600; }
+        .nav-link i { width: 22px; text-align: center; font-size: 16px; }
+
+        /* ========================================
+           MAIN CONTENT
+           ======================================== */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 0 25px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h2 { font-size: 20px; font-weight: 700; color: var(--dark-blue); }
+        .page-title p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+        .logout-btn:hover { background: #fdecea; }
+
+        .back-btn {
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 9px 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .back-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(26,42,108,0.3); }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .content-area { padding: 25px; }
+
+        /* ========================================
+           PROFILE HERO HEADER
+           ======================================== */
+        .profile-hero {
+            background: linear-gradient(135deg, var(--dark-blue) 0%, var(--primary-blue) 60%, var(--light-blue) 100%);
+            border-radius: 24px;
+            padding: 35px 40px;
+            color: white;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(26,42,108,0.35);
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: -60px;
+            width: 280px;
+            height: 280px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
+
+        .profile-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: -40px;
+            width: 350px;
+            height: 350px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .hero-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+
+        .student-avatar-hero {
+            width: 90px;
+            height: 90px;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.4);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .student-avatar-hero i { font-size: 42px; color: var(--gold); }
+
+        .hero-info { flex: 1; }
+
+        .student-code-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 10px;
+            padding: 5px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            backdrop-filter: blur(6px);
+        }
+
+        .student-code-badge i { color: var(--gold); font-size: 12px; }
+
+        .hero-name {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .hero-dept {
+            font-size: 15px;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hero-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .hero-meta-item {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(6px);
+            transition: background 0.3s;
+        }
+
+        .hero-meta-item:hover { background: rgba(255,255,255,0.15); }
+
+        .meta-icon {
+            width: 38px;
+            height: 38px;
+            background: rgba(244,162,97,0.2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .meta-icon i { font-size: 16px; color: var(--gold); }
+
+        .meta-text { overflow: hidden; }
+        .meta-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .meta-value { font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        /* ========================================
+           SECTION HEADERS
+           ======================================== */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .section-header .section-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .section-header .section-icon i { color: white; font-size: 18px; }
+        .section-header h3 { font-size: 18px; font-weight: 700; color: var(--dark-blue); }
+        .section-header p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+        /* ========================================
+           TABS NAVIGATION
+           ======================================== */
+        .profile-tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+        
+        .profile-tabs::-webkit-scrollbar { height: 4px; }
+        .profile-tabs::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gray);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover { background: rgba(0,0,0,0.03); color: var(--dark-blue); }
+        
+        .tab-btn.active {
+            background: var(--dark-blue);
+            color: white;
+            box-shadow: 0 4px 10px rgba(26,42,108,0.2);
+        }
+        
+        .tab-content-section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .tab-content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========================================
+           COURSE SUMMARY CARD
+           ======================================== */
+        .course-summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 30px;
+            margin-bottom: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 1px solid rgba(26,42,108,0.06);
+        }
+
+        .course-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .course-stat {
+            background: linear-gradient(135deg, #f0f4ff, #e8eeff);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            border: 1px solid rgba(60,110,200,0.1);
+            transition: transform 0.2s;
+        }
+
+        .course-stat:hover { transform: translateY(-3px); }
+
+        .course-stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
+        .course-stat-icon.blue { background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue)); }
+        .course-stat-icon.gold { background: linear-gradient(135deg, #f4a261, #e76f51); }
+        .course-stat-icon.green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .course-stat-icon.purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); }
+
+        .course-stat-icon i { color: white; font-size: 18px; }
+        .course-stat-value { font-size: 22px; font-weight: 800; color: var(--dark-blue); margin-bottom: 4px; }
+        .course-stat-label { font-size: 12px; color: var(--gray); }
+
+        /* ========================================
+           LEVELS GRID
+           ======================================== */
+        .levels-section {
+            margin-bottom: 30px;
+        }
+
+        .levels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .level-card {
+            background: white;
+            border-radius: 20px;
+            padding: 22px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--dark-blue), var(--primary-blue));
+        }
+
+        .level-card.paid::before { background: linear-gradient(90deg, #2ecc71, #27ae60); }
+        .level-card.partial::before { background: linear-gradient(90deg, #f39c12, #e67e22); }
+        .level-card.unpaid::before { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+
+        .level-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .level-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .level-number {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .level-number i { color: var(--primary-blue); }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-paid { background: #d5f5e3; color: #1a8a4a; }
+        .badge-partial { background: #fef3cd; color: #856404; }
+        .badge-unpaid { background: #fde8e8; color: #c0392b; }
+
+        .level-amounts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .amount-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: var(--light-gray);
+            border-radius: 10px;
+        }
+
+        .amount-label { font-size: 12px; color: var(--gray); }
+        .amount-value { font-size: 13px; font-weight: 700; color: var(--dark-blue); }
+
+        .amount-row.paid-row .amount-value { color: #1a8a4a; }
+        .amount-row.remaining-row .amount-value { color: #c0392b; }
+        .amount-row.discount-row .amount-value { color: #e67e22; }
+
+        /* ========================================
+           PAYMENT HISTORY TABLE
+           ======================================== */
+        .payment-section { margin-bottom: 30px; }
+
+        .payment-table-container {
+            background: white;
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-top: 20px;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        .payment-table thead th {
+            background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue));
+            color: white;
+            padding: 16px 18px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 700;
+            position: sticky;
+            top: 0;
+        }
+
+        .payment-table thead th:first-child { border-radius: 0 0 0 0; }
+        .payment-table thead th:last-child { border-radius: 0 0 0 0; }
+
+        .payment-table tbody tr {
+            transition: background 0.2s;
+            border-bottom: 1px solid #f0f2f8;
+        }
+
+        .payment-table tbody tr:last-child { border-bottom: none; }
+        .payment-table tbody tr:hover { background: #f8f9ff; }
+
+        .payment-table tbody td {
+            padding: 14px 18px;
+            font-size: 13px;
+            color: var(--dark);
+        }
+
+        .payment-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .type-cash { background: #d5f5e3; color: #1a8a4a; }
+        .type-installment { background: #fef3cd; color: #856404; }
+        .type-transfer { background: #d6eaf8; color: #1a5276; }
+
+        .empty-payments {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-payments i { font-size: 50px; color: #dde; margin-bottom: 15px; display: block; }
+        .empty-payments p { font-size: 16px; }
+
+        /* ========================================
+           LOADING OVERLAY
+           ======================================== */
+        .loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(240,242,248,0.92);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-overlay.show { display: flex; }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(26,42,108,0.15);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 15px;
+            color: var(--dark-blue);
+            font-weight: 600;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        /* ========================================
+           TOAST
+           ======================================== */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 400px;
+            font-family: inherit;
+        }
+
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-30px); } }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 992px) {
+            .hero-meta-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(100%);
+                position: fixed;
+                z-index: 1000;
+            }
+
+            .sidebar.open { transform: translateX(0); }
+
+            .main-content { margin-right: 0; }
+            .menu-toggle { display: block; }
+            .content-area { padding: 15px; }
+
+            .profile-hero { padding: 25px 20px; }
+            .hero-name { font-size: 22px; }
+            .hero-meta-grid { grid-template-columns: 1fr 1fr; }
+
+            .levels-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+            .course-summary-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 480px) {
+            .hero-top { flex-direction: column; align-items: center; text-align: center; }
+            .hero-dept { justify-content: center; }
+            .hero-meta-grid { grid-template-columns: 1fr; }
+            .course-summary-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">جاري تحميل بيانات الطالب...</div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon">
+                <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-name" id="userName">...</div>
+            <div class="user-role" id="userRole">...</div>
+        </div>
+
+        <ul class="nav-menu" id="navMenu"></ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="page-title">
+                <h2>ملف الطالب</h2>
+                <p id="profileSubtitle">عرض تفاصيل الطالب ومدفوعاته</p>
+            </div>
+            <div class="header-actions">
+                <button class="back-btn" onclick="history.back()">
+                    <i class="fas fa-arrow-right"></i>
+                    رجوع
+                </button>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>خروج</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-area">
+
+            <!-- ======== HERO / HEADER SECTION ======== -->
+            <div class="profile-hero" id="profileHero" style="display:none;">
+                <div class="hero-content">
+                    <div class="hero-top">
+                        <div class="student-avatar-hero">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="hero-info">
+                            <div class="student-code-badge">
+                                <i class="fas fa-id-badge"></i>
+                                <span id="heroCode">—</span>
+                            </div>
+                            <div class="hero-name" id="heroName">—</div>
+                            <div class="hero-dept">
+                                <i class="fas fa-building"></i>
+                                <span id="heroDept">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-meta-grid">
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-phone"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">رقم الهاتف</div>
+                                <div class="meta-value" id="heroPhone">—</div>
+                            </div>
+                        </div>
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-university"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">المدرسة / الجامعة</div>
+                                <div class="meta-value" id="heroSchool">—</div>
+                            </div>
+                        </div>
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-birthday-cake"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">السن</div>
+                                <div class="meta-value" id="heroAge">—</div>
+                            </div>
+                        </div>
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-calendar-plus"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">تاريخ التسجيل</div>
+                                <div class="meta-value" id="heroCreatedAt">—</div>
+                            </div>
+                        </div>
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-users"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">الجروب</div>
+                                <div class="meta-value" id="heroGroup">—</div>
+                            </div>
+                        </div>
+                        <div class="hero-meta-item">
+                            <div class="meta-icon"><i class="fas fa-book-open"></i></div>
+                            <div class="meta-text">
+                                <div class="meta-label">الكورس</div>
+                                <div class="meta-value" id="heroCourse">—</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div id="profileContent" style="display:none;">
+                <div class="profile-tabs">
+                    <button class="tab-btn active" onclick="switchTab('academic')"><i class="fas fa-graduation-cap"></i> الأكاديمية</button>
+                    <button class="tab-btn" onclick="switchTab('financial')"><i class="fas fa-wallet"></i> المالية</button>
+                    <button class="tab-btn" onclick="switchTab('attendance')"><i class="fas fa-calendar-check"></i> الحضور والجدول</button>
+                    <button class="tab-btn" onclick="switchTab('files')"><i class="fas fa-folder-open"></i> الملفات</button>
+                </div>
+
+                <!-- Academic Tab -->
+                <div id="tab-academic" class="tab-content-section active">
+                    <!-- ======== COURSE SUMMARY ======== -->
+                    <div class="course-summary-card" id="courseSummaryCard">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-chart-bar"></i></div>
+                            <div>
+                                <h3>ملخص الكورس</h3>
+                                <p>نظرة عامة على الكورس والمدفوعات</p>
+                            </div>
+                        </div>
+                        <div class="course-summary-grid">
+                            <div class="course-stat">
+                                <div class="course-stat-icon blue"><i class="fas fa-book"></i></div>
+                                <div class="course-stat-value" id="summaryCourseName" style="font-size:16px;">—</div>
+                                <div class="course-stat-label">اسم الكورس</div>
+                            </div>
+                            <div class="course-stat">
+                                <div class="course-stat-icon gold"><i class="fas fa-layer-group"></i></div>
+                                <div class="course-stat-value" id="summaryLevels">—</div>
+                                <div class="course-stat-label">عدد المستويات</div>
+                            </div>
+                            <div class="course-stat">
+                                <div class="course-stat-icon purple"><i class="fas fa-tag"></i></div>
+                                <div class="course-stat-value" id="summaryPricePerLevel">—</div>
+                                <div class="course-stat-label">سعر المستوى (جنيه)</div>
+                            </div>
+                            <div class="course-stat">
+                                <div class="course-stat-icon green"><i class="fas fa-money-bill-wave"></i></div>
+                                <div class="course-stat-value" id="summaryTotalPaid">—</div>
+                                <div class="course-stat-label">إجمالي المدفوع (جنيه)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ======== LEVELS GRID ======== -->
+                    <div class="levels-section" id="levelsSection">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-list-ol"></i></div>
+                            <div>
+                                <h3>المستويات</h3>
+                                <p>تفاصيل الدفع لكل مستوى</p>
+                            </div>
+                        </div>
+                        <div class="levels-grid" id="levelsGrid"></div>
+                    </div>
+                </div>
+
+                <!-- Financial Tab -->
+                <div id="tab-financial" class="tab-content-section">
+                    <!-- ======== PAYMENT HISTORY ======== -->
+                    <div class="payment-section" id="paymentSection">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-history"></i></div>
+                            <div>
+                                <h3>سجل المدفوعات</h3>
+                                <p>جميع عمليات الدفع الخاصة بالطالب</p>
+                            </div>
+                        </div>
+                        <div class="payment-table-container">
+                            <table class="payment-table" id="paymentTable">
+                                <thead>
+                                    <tr>
+                                        <th><i class="fas fa-calendar-alt" style="margin-left:6px;"></i>التاريخ</th>
+                                        <th><i class="fas fa-layer-group" style="margin-left:6px;"></i>رقم المستوى</th>
+                                        <th><i class="fas fa-tag" style="margin-left:6px;"></i>نوع الدفع</th>
+                                        <th><i class="fas fa-money-bill-wave" style="margin-left:6px;"></i>المبلغ المدفوع</th>
+                                        <th><i class="fas fa-percent" style="margin-left:6px;"></i>الخصم</th>
+                                        <th><i class="fas fa-receipt" style="margin-left:6px;"></i>رقم الإيصال</th>
+                                        <th><i class="fas fa-receipt" style="margin-left:6px;"></i>إجمالي المستوى</th>
+                                        <th><i class="fas fa-exclamation-circle" style="margin-left:6px;"></i>المتبقي</th>
+                                        <th><i class="fas fa-sticky-note" style="margin-left:6px;"></i>ملاحظات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attendance Tab -->
+                <div id="tab-attendance" class="tab-content-section">
+                    <div class="course-summary-card">
+                        <div class="section-header">
+                            <div class="section-icon" style="background:var(--info);"><i class="fas fa-calendar-check"></i></div>
+                            <div>
+                                <h3>جدول الطالب / الحضور</h3>
+                                <p>مواعيد محاضرات الطالب بناءً على الجروب المخصص له</p>
+                            </div>
+                        </div>
+                        <div id="attendanceContent" style="padding: 20px; text-align: center; color: var(--gray);">
+                            <i class="fas fa-tools" style="font-size:40px; color:#ddd; margin-bottom:15px; display:block;"></i>
+                            قريباً: عرض جدول المحاضرات وتسجيل الحضور والغياب.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Files Tab -->
+                <div id="tab-files" class="tab-content-section">
+                    <div class="course-summary-card">
+                        <div class="section-header">
+                            <div class="section-icon" style="background:var(--success);"><i class="fas fa-folder-open"></i></div>
+                            <div>
+                                <h3>ملفات الطالب</h3>
+                                <p>الشهادات، صور البطاقة، والمستندات</p>
+                            </div>
+                        </div>
+                        <div style="padding: 40px; text-align: center; color: var(--gray); border: 2px dashed #ddd; border-radius: 12px; background: #fafafa;">
+                            <i class="fas fa-cloud-upload-alt" style="font-size:40px; color:#ccc; margin-bottom:15px; display:block;"></i>
+                            هذه الميزة قيد التطوير (قريباً).
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ======== ERROR STATE ======== -->
+            <div id="errorState" style="display:none; text-align:center; padding:80px 20px;">
+                <i class="fas fa-exclamation-triangle" style="font-size:60px; color:#f39c12; display:block; margin-bottom:20px;"></i>
+                <h3 style="color:var(--dark-blue); margin-bottom:10px;">تعذر تحميل بيانات الطالب</h3>
+                <p style="color:var(--gray); margin-bottom:20px;" id="errorMessage">حدث خطأ أثناء جلب البيانات.</p>
+                <button onclick="loadStudentData()" style="padding:12px 28px; background:var(--primary-blue); color:white; border:none; border-radius:12px; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600;">
+                    <i class="fas fa-redo" style="margin-left:8px;"></i> إعادة المحاولة
+                </button>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script src="sidebar.js"></script>
+<script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+
+    // ===== TOAST =====
+    function showToast(message, type = 'info') {
+        const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
+        document.getElementById('toastContainer').appendChild(toast);
+        setTimeout(() => toast.remove(), 4100);
+    }
+
+    // ===== LOADING =====
+    function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+    function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+
+    // ===== API CALL =====
+    async function apiCall(action, params = {}) {
+        const url = new URL(API_URL);
+        url.searchParams.append('action', action);
+        Object.entries(params).forEach(([k, v]) => url.searchParams.append(k, v));
+        const res = await fetch(url.toString());
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+        return data;
+    }
+
+    // ===== FORMAT =====
+    function formatDate(dateStr) {
+        if (!dateStr) return '—';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d)) return dateStr;
+            return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+        } catch { return dateStr; }
+    }
+
+    function formatCurrency(val) {
+        const n = parseFloat(val) || 0;
+        return n.toLocaleString('ar-EG') + ' جنيه';
+    }
+
+    // ===== GET STUDENT ID FROM URL =====
+    function switchTab(tabId) {
+        // Update Buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        
+        // Update Content
+        document.querySelectorAll('.tab-content-section').forEach(sec => sec.classList.remove('active'));
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+    }
+
+    function getStudentIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get('id');
+    }
+
+    // ===== MAIN LOAD =====
+    async function loadStudentData() {
+        const studentId = getStudentIdFromUrl();
+
+        if (!studentId) {
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = 'لم يتم تحديد معرف الطالب في الرابط.';
+            return;
+        }
+
+        showLoading();
+        document.getElementById('errorState').style.display = 'none';
+
+        try {
+            // Fetch all data in parallel
+            const [studentRes, deptsRes, groupsRes, coursesRes, paymentsRes] = await Promise.all([
+                apiCall('getStudentById', { studentId }),
+                apiCall('getAllDepartments'),
+                apiCall('getAllGroups'),
+                apiCall('getAllCourses'),
+                apiCall('getAllPayments')
+            ]);
+
+            const student = studentRes.data || studentRes;
+            const depts = (deptsRes.data || deptsRes) || [];
+            const groups = (groupsRes.data || groupsRes) || [];
+            const courses = (coursesRes.data || coursesRes) || [];
+            const allPayments = (paymentsRes.data || paymentsRes) || [];
+
+            // Lookup related data
+            const dept = depts.find(d => String(d.id) === String(student.deptId)) || {};
+            const group = groups.find(g => String(g.id) === String(student.groupId)) || {};
+            const course = courses.find(c => String(c.id) === String(group.courseId)) || {};
+
+            // Filter payments for this student
+            const studentPayments = allPayments.filter(p => String(p.studentId) === String(student.id));
+
+            renderHero(student, dept, group, course);
+            renderCourseSummary(course, studentPayments);
+            renderLevels(course, studentPayments);
+            renderPayments(studentPayments);
+
+            // Update subtitle
+            document.getElementById('profileSubtitle').textContent = `ملف الطالب: ${student.name || ''}`;
+
+            showToast('تم تحميل بيانات الطالب بنجاح', 'success');
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = err.message || 'حدث خطأ غير متوقع.';
+            showToast('فشل في تحميل البيانات: ' + err.message, 'error');
+        } finally {
+            hideLoading();
+        }
+    }
+
+    // ===== RENDER HERO =====
+    function renderHero(student, dept, group, course) {
+        document.getElementById('heroCode').textContent = student.code || '—';
+        document.getElementById('heroName').textContent = student.name || '—';
+        document.getElementById('heroDept').textContent = dept.name || '—';
+        document.getElementById('heroPhone').textContent = student.phone || '—';
+        document.getElementById('heroSchool').textContent = student.school || '—';
+        document.getElementById('heroAge').textContent = student.age ? student.age + ' سنة' : '—';
+        document.getElementById('heroCreatedAt').textContent = formatDate(student.createdAt);
+        document.getElementById('heroGroup').textContent = group.name || '—';
+        document.getElementById('heroCourse').textContent = course.name || group.courseName || '—';
+
+        document.getElementById('profileHero').style.display = 'block';
+    }
+
+    // ===== RENDER COURSE SUMMARY =====
+    function renderCourseSummary(course, payments) {
+        const totalPaid = payments.reduce((sum, p) => sum + (parseFloat(p.amountPaid) || 0), 0);
+
+        document.getElementById('summaryCourseName').textContent = course.name || '—';
+        document.getElementById('summaryLevels').textContent = course.durationLevels || '—';
+        document.getElementById('summaryPricePerLevel').textContent = course.pricePerLevel ? Number(course.pricePerLevel).toLocaleString('ar-EG') : '—';
+        document.getElementById('summaryTotalPaid').textContent = totalPaid.toLocaleString('ar-EG');
+
+        document.getElementById('summaryTotalPaid').textContent = totalPaid.toLocaleString('ar-EG');
+        document.getElementById('profileContent').style.display = 'block';
+    }
+
+    // ===== RENDER LEVELS =====
+    function renderLevels(course, payments) {
+        const levelCount = parseInt(course.durationLevels) || 0;
+        const pricePerLevel = parseFloat(course.pricePerLevel) || 0;
+
+        if (levelCount === 0) {
+            return;
+        }
+
+        const grid = document.getElementById('levelsGrid');
+        grid.innerHTML = '';
+
+        for (let i = 1; i <= levelCount; i++) {
+            // Get payments for this level
+            const levelPayments = payments.filter(p => parseInt(p.levelNumber) === i);
+            const totalPaidForLevel = levelPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid) || 0), 0);
+            const totalDiscount = levelPayments.reduce((sum, p) => sum + (parseFloat(p.discountAmount) || 0), 0);
+
+            // Use totalFee and remainingBalance from payment records if available
+            const latestPayment = levelPayments[levelPayments.length - 1];
+            const totalFee = latestPayment ? (parseFloat(latestPayment.totalFee) || pricePerLevel) : pricePerLevel;
+            const remaining = latestPayment ? (parseFloat(latestPayment.remainingBalance) || 0) : (pricePerLevel - totalPaidForLevel);
+
+            // Determine status
+            let statusClass, statusLabel, cardClass;
+            if (levelPayments.length === 0) {
+                statusClass = 'badge-unpaid'; statusLabel = 'غير مدفوع'; cardClass = 'unpaid';
+            } else if (remaining <= 0) {
+                statusClass = 'badge-paid'; statusLabel = 'مدفوع'; cardClass = 'paid';
+            } else {
+                statusClass = 'badge-partial'; statusLabel = 'جزئي'; cardClass = 'partial';
+            }
+
+            grid.innerHTML += `
+                <div class="level-card ${cardClass}">
+                    <div class="level-card-header">
+                        <div class="level-number">
+                            <i class="fas fa-layer-group"></i>
+                            المستوى ${arabicNum(i)}
+                        </div>
+                        <span class="status-badge ${statusClass}">${statusLabel}</span>
+                    </div>
+                    <div class="level-amounts">
+                        <div class="amount-row">
+                            <span class="amount-label"><i class="fas fa-receipt" style="margin-left:5px;"></i>إجمالي المستوى</span>
+                            <span class="amount-value">${totalFee.toLocaleString('ar-EG')} جنيه</span>
+                        </div>
+                        <div class="amount-row paid-row">
+                            <span class="amount-label"><i class="fas fa-money-bill-wave" style="margin-left:5px;"></i>المدفوع</span>
+                            <span class="amount-value">${totalPaidForLevel.toLocaleString('ar-EG')} جنيه</span>
+                        </div>
+                        ${totalDiscount > 0 ? `
+                        <div class="amount-row discount-row">
+                            <span class="amount-label"><i class="fas fa-percent" style="margin-left:5px;"></i>الخصم</span>
+                            <span class="amount-value">${totalDiscount.toLocaleString('ar-EG')} جنيه</span>
+                        </div>` : ''}
+                        <div class="amount-row remaining-row">
+                            <span class="amount-label"><i class="fas fa-exclamation-circle" style="margin-left:5px;"></i>المتبقي</span>
+                            <span class="amount-value">${Math.max(0, remaining).toLocaleString('ar-EG')} جنيه</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        document.getElementById('levelsSection').style.display = 'block';
+    }
+
+    // Arabic numerals helper
+    function arabicNum(n) {
+        const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
+        return String(n).replace(/[0-9]/g, d => ar[d]);
+    }
+
+    // ===== RENDER PAYMENT TABLE =====
+    function renderPayments(payments) {
+        const tbody = document.getElementById('paymentTableBody');
+
+        if (payments.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-payments">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                            <p>لا توجد مدفوعات مسجلة لهذا الطالب</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        } else {
+            // Sort by date descending
+            const sorted = [...payments].sort((a, b) => new Date(b.paymentDate) - new Date(a.paymentDate));
+
+            tbody.innerHTML = sorted.map(p => {
+                const typeClass = getPaymentTypeClass(p.paymentType);
+                const remaining = parseFloat(p.remainingBalance) || 0;
+                const remainingColor = remaining > 0 ? 'color:#c0392b;font-weight:700;' : 'color:#1a8a4a;font-weight:700;';
+
+                return `
+                    <tr>
+                        <td>${formatDate(p.paymentDate)}</td>
+                        <td style="text-align:center;">
+                            <span style="background:#e8eeff;color:var(--dark-blue);padding:4px 12px;border-radius:20px;font-weight:700;font-size:12px;">
+                                المستوى ${p.levelNumber || '—'}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="payment-type-badge ${typeClass}">${p.paymentType || '—'}</span>
+                        </td>
+                        <td style="color:#1a8a4a;font-weight:700;">
+                            ${parseFloat(p.amountPaid || 0).toLocaleString('ar-EG')} جنيه
+                        </td>
+                        <td style="color:#e67e22;font-weight:600;">
+                            ${parseFloat(p.discountAmount || 0).toLocaleString('ar-EG')} جنيه
+                        </td>
+                        <td style="color:#555;font-weight:600;font-family:monospace;">
+                            ${p.receipt_number || '—'}
+                        </td>
+                        <td style="font-weight:700;">
+                            ${parseFloat(p.totalFee || 0).toLocaleString('ar-EG')} جنيه
+                        </td>
+                        <td style="${remainingColor}">
+                            ${Math.max(0, remaining).toLocaleString('ar-EG')} جنيه
+                        </td>
+                        <td style="color:var(--gray);font-size:12px;">${p.notes || '—'}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+    }
+
+    function getPaymentTypeClass(type) {
+        if (!type) return 'type-cash';
+        const t = type.toLowerCase();
+        if (t.includes('تحويل') || t.includes('transfer')) return 'type-transfer';
+        if (t.includes('قسط') || t.includes('installment')) return 'type-installment';
+        return 'type-cash';
+    }
+
+    // ===== USER SESSION =====
+    function initUserSession() {
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                document.getElementById('userName').textContent = user.name || user.username || 'المستخدم';
+                document.getElementById('userRole').textContent = user.role || 'مستخدم';
+            } catch (e) {}
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+        });
+    }
+
+    // ===== MENU TOGGLE =====
+    function initMenuToggle() {
+        const toggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        if (toggle && sidebar) {
+            toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !toggle.contains(e.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+        }
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', () => {
+        initUserSession();
+        initMenuToggle();
+        loadStudentData();
+    });
+</script>
+</body>
+</html>

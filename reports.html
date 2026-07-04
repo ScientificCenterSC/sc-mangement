@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | التقارير</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js">
+    function exportToExcel(btnElement) {
+        // Find the closest report container and then the table
+        const container = btnElement.closest('.report-container');
+        const table = container.querySelector('table');
+        if (!table) return;
+
+        let csv = '\uFEFF'; // Add BOM for Excel Arabic support
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            for (let j = 0; j < cols.length; j++) {
+                // Get text and escape quotes
+                let data = cols[j].innerText.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            csv += row.join(',') + '\n';
+        }
+        
+        // Download
+        const tabName = document.querySelector('.tab-btn.active').innerText.trim() || 'تقرير';
+        const filename = tabName + '_' + new Date().toLocaleDateString('ar-EG') + '.csv';
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+</script>
+
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --dark-blue: #1a2a6c;
+            --medium-blue: #2a4a9c;
+            --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0;
+            --gold: #f4a261;
+            --gold-dark: #e76f51;
+            --white: #ffffff;
+            --light-gray: #f8f9fa;
+            --gray: #6c757d;
+            --dark: #1e2a3e;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+            --sidebar-width: 270px;
+            --header-height: 65px;
+        }
+
+        body {
+            font-family: 'Cairo', 'Poppins', sans-serif;
+            background: var(--light-gray);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        .sidebar-logo {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo .logo-icon {
+            width: 55px;
+            height: 55px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+        .sidebar-logo .logo-icon i { font-size: 28px; color: var(--gold); }
+        .sidebar-logo h3 { font-size: 18px; margin-bottom: 3px; }
+        .sidebar-logo p { font-size: 10px; opacity: 0.7; }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.08);
+            margin: 15px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+        .user-avatar i { font-size: 24px; color: var(--dark-blue); }
+        .user-name { font-weight: 700; font-size: 14px; }
+        .user-role { font-size: 11px; color: var(--gold); margin-top: 5px; }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-link.active { background: var(--gold); color: var(--dark-blue); font-weight: 600; }
+        .nav-link i { width: 22px; text-align: center; font-size: 16px; }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-right: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: var(--white);
+            padding: 0 25px;
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 99;
+        }
+
+        .page-title h2 { font-size: 20px; font-weight: 700; color: var(--dark-blue); }
+        .page-title p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .logout-btn {
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-btn:hover { background: #fdecea; }
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--dark-blue);
+            cursor: pointer;
+        }
+
+        .content-area { padding: 25px; }
+
+        /* Report Tabs */
+        .report-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            background: var(--white);
+            padding: 10px;
+            border-radius: 16px;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tab-btn.active {
+            background: var(--primary-blue);
+            color: white;
+        }
+        .tab-btn:hover:not(.active) {
+            background: var(--light-gray);
+        }
+
+        /* Report Container */
+        .report-container {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .report-container.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        .filter-group input, .filter-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-family: inherit;
+        }
+        .btn-export {
+            padding: 10px 20px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-print {
+            padding: 10px 20px;
+            background: var(--info);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border-right: 4px solid var(--gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .stat-info .stat-value { font-size: 28px; font-weight: 800; color: var(--dark-blue); }
+        .stat-info .stat-label { color: var(--gray); font-size: 12px; margin-top: 5px; }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--light-blue), var(--primary-blue));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .stat-icon i { font-size: 24px; color: white; }
+
+        /* Tables */
+        .report-table-container {
+            background: var(--white);
+            border-radius: 20px;
+            overflow-x: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+        .report-table th {
+            text-align: right;
+            padding: 14px;
+            background: var(--dark-blue);
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .report-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 13px;
+        }
+        .report-table tr:hover { background: var(--light-gray); }
+
+        /* Charts */
+        .chart-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chart-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark-blue);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        canvas { max-height: 300px; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }
+        .status-unpaid { background: #f8d7da; color: #721c24; }
+        .status-active { background: #d4edda; color: #155724; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            display: none;
+        }
+        .loading-overlay.show { display: flex; }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e9ecef;
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            padding: 14px 24px;
+            border-radius: 14px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 3.7s forwards;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            max-width: 400px;
+            font-family: inherit;
+        }
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-30px); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 1000;
+            }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+            .menu-toggle { display: block; }
+            .content-area { padding: 15px; }
+            .report-tabs { justify-content: center; }
+            .tab-btn { padding: 8px 16px; font-size: 12px; }
+        }
+
+        @media print {
+            body { background: white; margin: 0; padding: 0; }
+            .app-container { display: block; }
+            .sidebar, .top-header, .report-tabs, .filter-bar, .btn-export, .btn-print, .menu-toggle, .logout-btn {
+                display: none !important;
+            }
+            .main-content {
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100%;
+            }
+            .report-section {
+                display: none;
+            }
+            .report-section.active {
+                display: block;
+            }
+            .chart-card, .stat-card {
+                break-inside: avoid;
+            }
+        }</style>
+</head>
+<body>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+        <div class="user-info" id="userInfo">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name" id="userName"></div>
+            <div class="user-role" id="userRole"></div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>الرئيسية</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="students.html" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>الطلاب</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="trainers.html" class="nav-link">
+                    <i class="fas fa-chalkboard-user"></i>
+                    <span>المدربين</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="schedule.html" class="nav-link">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>الجدول</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="payments.html" class="nav-link">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <span>المدفوعات</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="reports.html" class="nav-link active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>التقارير</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            <div class="page-title">
+                <h2>التقارير</h2>
+                <p>تقارير مالية وإدارية شاملة</p>
+            </div>
+            <div class="header-actions">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>خروج</span></button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Report Tabs -->
+            <div class="report-tabs">
+                <button class="tab-btn active" data-tab="financial"><i class="fas fa-chart-line"></i> تقرير مالي</button>
+                <button class="tab-btn" data-tab="students"><i class="fas fa-users"></i> تقرير الطلاب</button>
+                <button class="tab-btn" data-tab="payments"><i class="fas fa-money-bill-wave"></i> تقرير المدفوعات</button>
+                <button class="tab-btn" data-tab="attendance"><i class="fas fa-calendar-check"></i> تقرير الحضور</button>
+                <button class="tab-btn" data-tab="overdue"><i class="fas fa-exclamation-triangle"></i> المتأخرات</button>
+            </div>
+
+            <!-- Financial Report -->
+            <div id="financialReport" class="report-container report-section active">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar"></i> من تاريخ</label>
+                        <input type="date" id="financialFromDate">
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
+                        <input type="date" id="financialToDate">
+                    </div>
+                    <button class="btn-filter" id="applyFinancialFilter" style="padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 10px;">تطبيق</button>
+                    <button class="btn-export" onclick="exportToExcel(this)"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة / تصدير PDF</button>
+                </div>
+
+                <div class="stats-grid" id="financialStats"></div>
+
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-chart-line"></i> الإيرادات الشهرية</div>
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-title"><i class="fas fa-chart-pie"></i> توزيع المدفوعات</div>
+                    <canvas id="paymentDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Students Report -->
+            <div id="studentsReport" class="report-container report-section">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-building"></i> القسم</label>
+                        <select id="studentDeptFilter">
+                            <option value="all">الكل</option>
+                            <option value="1">تقنية المعلومات</option>
+                            <option value="2">اللغات</option>
+                            <option value="3">إدارة الأعمال</option>
+                            <option value="4">التصميم</option>
+                        </select>
+                    </div>
+                    <button class="btn-export" onclick="exportToExcel(this)"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة / تصدير PDF</button>
+                </div>
+                <div class="report-table-container">
+                    <table class="report-table" id="studentsReportTable">
+                        <thead>
+                            <tr><th>الكود</th><th>الاسم</th><th>الهاتف</th><th>القسم</th><th>الجروب</th><th>تاريخ التسجيل</th></tr>
+                        </thead>
+                        <tbody id="studentsReportBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Payments Report -->
+            <div id="paymentsReport" class="report-container report-section">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar"></i> من تاريخ</label>
+                        <input type="date" id="paymentsFromDate">
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar"></i> إلى تاريخ</label>
+                        <input type="date" id="paymentsToDate">
+                    </div>
+                    <button class="btn-filter" id="applyPaymentsFilter" style="padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 10px;">تطبيق</button>
+                    <button class="btn-export" onclick="exportToExcel(this)"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة / تصدير PDF</button>
+                </div>
+                <div class="report-table-container">
+                    <table class="report-table" id="paymentsReportTable">
+                        <thead>
+                            <tr><th>الطالب</th><th>الكود</th><th>المستوى</th><th>المبلغ</th><th>التاريخ</th><th>الحالة</th></tr>
+                        </thead>
+                        <tbody id="paymentsReportBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Attendance Report -->
+            <div id="attendanceReport" class="report-container report-section">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-chalkboard-user"></i> المدرب</label>
+                        <select id="attendanceTrainerFilter">
+                            <option value="all">الكل</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label><i class="fas fa-calendar-week"></i> الأسبوع</label>
+                        <input type="week" id="attendanceWeek">
+                    </div>
+                    <button class="btn-filter" id="applyAttendanceFilter" style="padding: 10px 20px; background: var(--primary-blue); color: white; border: none; border-radius: 10px;">تطبيق</button>
+                    <button class="btn-export" onclick="exportToExcel(this)"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة / تصدير PDF</button>
+                </div>
+                <div class="report-table-container">
+                    <table class="report-table" id="attendanceTable">
+                        <thead id="attendanceHeader"></thead>
+                        <tbody id="attendanceBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Overdue Report -->
+            <div id="overdueReport" class="report-container report-section">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label><i class="fas fa-building"></i> القسم</label>
+                        <select id="overdueDeptFilter">
+                            <option value="all">الكل</option>
+                            <option value="1">تقنية المعلومات</option>
+                            <option value="2">اللغات</option>
+                            <option value="3">إدارة الأعمال</option>
+                            <option value="4">التصميم</option>
+                        </select>
+                    </div>
+                    <button class="btn-export" onclick="exportToExcel(this)"><i class="fas fa-file-excel"></i> تصدير Excel</button>
+                    <button class="btn-print" onclick="window.print()"><i class="fas fa-print"></i> طباعة / تصدير PDF</button>
+                </div>
+                <div class="stats-grid" id="overdueStats"></div>
+                <div class="report-table-container">
+                    <table class="report-table" id="overdueTable">
+                        <thead>
+                            <tr><th>الطالب</th><th>الكود</th><th>الهاتف</th><th>القسم</th><th>المبلغ المتبقي</th><th>آخر دفعة</th></tr>
+                        </thead>
+                        <tbody id="overdueBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // الرابط الجديد لـ Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+    
+    let currentUser = null;
+    let allStudents = [];
+    let allPayments = [];
+    let allTrainers = [];
+    let allBookings = [];
+    let monthlyRevenueChart, paymentDistributionChart;
+    
+    // Toast Notification
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4000);
+    }
+
+    // Centralized API Call
+    async function apiCall(action, data = {}) {
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action, ...data })
+            });
+            const result = await response.json();
+            if (result.success === false) {
+                throw new Error(result.message || 'حدث خطأ غير معروف');
+            }
+            return result.data !== undefined ? result.data : result;
+        } catch (error) {
+            if (error.message && !error.message.includes('fetch')) {
+                showToast(error.message, 'error');
+            } else {
+                showToast('حدث خطأ في الاتصال بالخادم', 'error');
+            }
+            throw error;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (!userStr) { window.location.href = 'index.html'; return; }
+        
+        try {
+            currentUser = JSON.parse(userStr);
+        } catch(e) {
+            sessionStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html';
+            return;
+        }
+        updateUserUI();
+        setupEventListeners();
+        loadData();
+        
+        // Set default dates
+        const today = new Date();
+        const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+        document.getElementById('financialFromDate').valueAsDate = firstDay;
+        document.getElementById('financialToDate').valueAsDate = today;
+        document.getElementById('paymentsFromDate').valueAsDate = firstDay;
+        document.getElementById('paymentsToDate').valueAsDate = today;
+        
+        // Set default week
+        const year = today.getFullYear();
+        const week = Math.ceil((((today - new Date(year, 0, 1)) / 86400000) + 1) / 7);
+        document.getElementById('attendanceWeek').value = `${year}-W${week.toString().padStart(2, '0')}`;
+    });
+
+    function updateUserUI() {
+        document.getElementById('userName').textContent = currentUser.fullName || currentUser.username;
+        const roleNames = {1: 'مدير النظام', 2: 'محاسب', 3: 'مدير دور', 4: 'مسؤول حجوزات', 5: 'مشاهد'};
+        document.getElementById('userRole').textContent = roleNames[currentUser.roleId] || 'مستخدم';
+    }
+
+    function setupEventListeners() {
+        document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+        document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'index.html'; });
+        
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.report-container').forEach(c => c.classList.remove('active'));
+                document.getElementById(this.dataset.tab + 'Report').classList.add('active');
+                
+                // Refresh current tab data
+                const activeTab = this.dataset.tab;
+                if (activeTab === 'financial') refreshFinancialReport();
+                else if (activeTab === 'students') refreshStudentsReport();
+                else if (activeTab === 'payments') refreshPaymentsReport();
+                else if (activeTab === 'attendance') refreshAttendanceReport();
+                else if (activeTab === 'overdue') refreshOverdueReport();
+            });
+        });
+        
+        // Filter buttons
+        document.getElementById('applyFinancialFilter').addEventListener('click', () => refreshFinancialReport());
+        document.getElementById('applyPaymentsFilter').addEventListener('click', () => refreshPaymentsReport());
+        document.getElementById('applyAttendanceFilter').addEventListener('click', () => refreshAttendanceReport());
+        document.getElementById('studentDeptFilter').addEventListener('change', () => refreshStudentsReport());
+        document.getElementById('overdueDeptFilter').addEventListener('change', () => refreshOverdueReport());
+        
+        // Printing is now handled natively via window.print() on the buttons
+    }
+
+    async function loadData() {
+        showLoading(true);
+        try {
+            allStudents = await apiCall('getAllStudents');
+            allPayments = await apiCall('getAllPayments');
+            allTrainers = await apiCall('getAllTrainers');
+            allBookings = await apiCall('getAllBookings');
+            allGroups = await apiCall('getAllGroups');
+            allCourses = await apiCall('getAllCourses');
+            
+            refreshFinancialReport();
+            refreshStudentsReport();
+            refreshPaymentsReport();
+            refreshAttendanceReport();
+            refreshOverdueReport();
+            
+            // Update trainer filter
+            const trainerFilter = document.getElementById('attendanceTrainerFilter');
+            trainerFilter.innerHTML = '<option value="all">الكل</option>';
+            allTrainers.forEach(t => {
+                trainerFilter.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+            });
+        } catch(e) { 
+            console.error(e); 
+            // Error handled in apiCall
+        }
+        showLoading(false);
+    }
+
+
+
+    function getAggregatedPaymentsData(paymentsList) {
+        let grouped = {};
+        paymentsList.forEach(p => {
+            const key = p.studentId + '__' + p.levelNumber + '__' + p.paymentType;
+            if (!grouped[key]) {
+                grouped[key] = { ...p, amountPaid: parseFloat(p.amountPaid)||0, discountAmount: parseFloat(p.discountAmount)||0 };
+            } else {
+                grouped[key].amountPaid += parseFloat(p.amountPaid)||0;
+                grouped[key].discountAmount += parseFloat(p.discountAmount)||0;
+                if (p.id > grouped[key].id) {
+                    grouped[key].remainingBalance = p.remainingBalance;
+                    grouped[key].id = p.id;
+                }
+            }
+        });
+
+        if (typeof allStudents !== 'undefined') {
+            allStudents.forEach(s => {
+                if (s.groupId) {
+                    const group = allGroups.find(g => String(g.id) === String(s.groupId));
+                    if (group) {
+                        const course = allCourses.find(c => String(c.id) === String(group.courseId));
+                        if (course) {
+                            const targetLevel = '1';
+                            const hasPayment = Object.values(grouped).some(p => String(p.studentId) === String(s.id) && String(p.levelNumber) === String(targetLevel));
+                            if (!hasPayment) {
+                                const coursePrice = parseFloat(course.pricePerLevel) || 0;
+                                const key = s.id + '__' + targetLevel + '__Unpaid';
+                                grouped[key] = {
+                                    studentId: s.id,
+                                    studentName: s.name,
+                                    levelNumber: targetLevel,
+                                    paymentType: '-',
+                                    paymentDate: s.createdAt,
+                                    amountPaid: 0,
+                                    remainingBalance: coursePrice,
+                                    totalFee: coursePrice
+                                };
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        return Object.values(grouped);
+    }
+
+    function refreshFinancialReport() {
+        const fromDate = document.getElementById('financialFromDate').value;
+        const toDate = document.getElementById('financialToDate').value;
+        
+        let filteredPayments = [...allPayments];
+        if (fromDate) filteredPayments = filteredPayments.filter(p => p.paymentDate >= fromDate);
+        if (toDate) filteredPayments = filteredPayments.filter(p => p.paymentDate <= toDate);
+        
+        const aggregated = getAggregatedPaymentsData(filteredPayments);
+        
+        const totalRevenue = filteredPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid) || 0), 0);
+        const totalRemaining = aggregated.reduce((sum, p) => sum + (parseFloat(p.remainingBalance) || 0), 0);
+        const totalTransactions = filteredPayments.length;
+        
+        document.getElementById('financialStats').innerHTML = `
+            <div class="stat-card"><div class="stat-info"><div class="stat-value">${totalRevenue.toLocaleString()} ج.م</div><div class="stat-label">إجمالي الإيرادات</div></div><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><div class="stat-value">${totalRemaining.toLocaleString()} ج.م</div><div class="stat-label">المتبقي</div></div><div class="stat-icon"><i class="fas fa-clock"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><div class="stat-value">${totalTransactions}</div><div class="stat-label">عدد المعاملات</div></div><div class="stat-icon"><i class="fas fa-receipt"></i></div></div>
+        `;
+        
+        updateMonthlyRevenueChart(filteredPayments);
+        updatePaymentDistributionChart(aggregated);
+    }
+
+    function updateMonthlyRevenueChart(payments) {
+        const months = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+        const monthlyData = new Array(12).fill(0);
+        
+        payments.forEach(p => {
+            if (p.paymentDate) {
+                const month = new Date(p.paymentDate).getMonth();
+                monthlyData[month] += p.amountPaid || 0;
+            }
+        });
+        
+        const ctx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        if (monthlyRevenueChart) monthlyRevenueChart.destroy();
+        monthlyRevenueChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: months, datasets: [{ label: 'الإيرادات (ج.م)', data: monthlyData, borderColor: '#3c6ec8', backgroundColor: 'rgba(60,110,200,0.05)', tension: 0.3, fill: true }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'top' } } }
+        });
+    }
+
+    function updatePaymentDistributionChart(payments) {
+        let paid = 0, partial = 0;
+        const studentPayments = {};
+        payments.forEach(p => {
+            if (!studentPayments[p.studentId]) studentPayments[p.studentId] = { totalPaid: 0, totalFee: 0, remainingBalance: 0 };
+            studentPayments[p.studentId].totalPaid += parseFloat(p.amountPaid) || 0;
+            studentPayments[p.studentId].totalFee += parseFloat(p.totalFee) || parseFloat(p.totalLevelFee) || 0;
+            studentPayments[p.studentId].remainingBalance += parseFloat(p.remainingBalance) || 0;
+        });
+        
+        Object.values(studentPayments).forEach(s => {
+            if (s.totalPaid > 0 && s.remainingBalance <= 0) paid++;
+            else if (s.totalPaid > 0 && s.remainingBalance > 0) partial++;
+        });
+        
+        const unpaid = allStudents.length - paid - partial;
+        
+        const ctx = document.getElementById('paymentDistributionChart').getContext('2d');
+        if (paymentDistributionChart) paymentDistributionChart.destroy();
+        paymentDistributionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: { labels: ['مدفوع بالكامل', 'مدفوع جزئياً', 'غير مدفوع'], datasets: [{ data: [paid, partial, unpaid], backgroundColor: ['#2ecc71', '#f39c12', '#e74c3c'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    }
+
+    function refreshStudentsReport() {
+        const deptFilter = document.getElementById('studentDeptFilter').value;
+        let filtered = [...allStudents];
+        if (deptFilter !== 'all') filtered = filtered.filter(s => s.deptId == deptFilter);
+        
+        const deptNames = {1: 'IT', 2: 'LANG', 3: 'BUS', 4: 'GD'};
+        document.getElementById('studentsReportBody').innerHTML = filtered.map(s => `
+            <tr>
+                <td>${s.code || '-'}</td>
+                <td>${s.name || '-'}</td>
+                <td>${s.phone || '-'}</td>
+                <td>${deptNames[s.deptId] || '-'}</td>
+                <td>${s.groupName || '-'}</td>
+                <td>${s.createdAt ? new Date(s.createdAt).toLocaleDateString('ar-EG') : '-'}</td>
+            </tr>
+        `).join('');
+    }
+
+    function refreshPaymentsReport() {
+        const fromDate = document.getElementById('paymentsFromDate').value;
+        const toDate = document.getElementById('paymentsToDate').value;
+        
+        let filtered = getAggregatedPaymentsData(allPayments);
+        if (fromDate) filtered = filtered.filter(p => p.paymentDate >= fromDate);
+        if (toDate) filtered = filtered.filter(p => p.paymentDate <= toDate);
+        
+        document.getElementById('paymentsReportBody').innerHTML = filtered.map(p => {
+            const status = p.remainingBalance === 0 ? 'مدفوع' : (p.amountPaid > 0 ? 'مدفوع جزئياً' : 'غير مدفوع');
+            const statusClass = p.remainingBalance === 0 ? 'status-paid' : (p.amountPaid > 0 ? 'status-partial' : 'status-unpaid');
+            return `
+                <tr>
+                    <td>${p.studentName || allStudents.find(s => s.id == p.studentId)?.name || '-'}</td>
+                    <td>${allStudents.find(s => s.id === p.studentId)?.code || '-'}</td>
+                    <td>المستوى ${p.levelNumber || 1}</td>
+                    <td>${(p.amountPaid || 0).toLocaleString()} ج.م</td>
+                    <td>${p.paymentDate ? new Date(p.paymentDate).toLocaleDateString('ar-EG') : '-'}</td>
+                    <td><span class="status-badge ${statusClass}">${status}</span></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function refreshAttendanceReport() {
+        const trainerFilter = document.getElementById('attendanceTrainerFilter').value;
+        let filtered = [...allBookings];
+        if (trainerFilter !== 'all') filtered = filtered.filter(b => b.trainerId == trainerFilter);
+        
+        const trainerNames = {};
+        allTrainers.forEach(t => { trainerNames[t.id] = t.name; });
+        
+        document.getElementById('attendanceBody').innerHTML = filtered.map(b => `
+            <tr>
+                <td>${b.day || '-'}</td>
+                <td>${b.startTime || '-'} - ${b.endTime || '-'}</td>
+                <td>${trainerNames[b.trainerId] || '-'}</td>
+                <td>قاعة ${b.hallId || '-'}</td>
+                <td>جروب ${b.groupId || '-'}</td>
+            </tr>
+        `).join('');
+        
+        document.getElementById('attendanceHeader').innerHTML = '<th>اليوم</th><th>الوقت</th><th>المدرب</th><th>القاعة</th><th>الجروب</th>';
+    }
+
+    function refreshOverdueReport() {
+        const deptFilter = document.getElementById('overdueDeptFilter').value;
+        
+        // Calculate overdue students (remaining balance > 0) using aggregated data
+        const aggregated = getAggregatedPaymentsData(allPayments);
+        const studentBalance = {};
+        aggregated.forEach(p => {
+            if (!studentBalance[p.studentId]) studentBalance[p.studentId] = 0;
+            studentBalance[p.studentId] += parseFloat(p.remainingBalance) || 0;
+        });
+        
+        let overdueStudents = allStudents.filter(s => (studentBalance[s.id] || 0) > 0);
+        if (deptFilter !== 'all') overdueStudents = overdueStudents.filter(s => s.deptId == deptFilter);
+        
+        const totalOverdue = overdueStudents.reduce((sum, s) => sum + (studentBalance[s.id] || 0), 0);
+        
+        document.getElementById('overdueStats').innerHTML = `
+            <div class="stat-card"><div class="stat-info"><div class="stat-value">${overdueStudents.length}</div><div class="stat-label">عدد الطلاب المتأخرين</div></div><div class="stat-icon"><i class="fas fa-users"></i></div></div>
+            <div class="stat-card"><div class="stat-info"><div class="stat-value">${totalOverdue.toLocaleString()} ج.م</div><div class="stat-label">إجمالي المتأخرات</div></div><div class="stat-icon"><i class="fas fa-dollar-sign"></i></div></div>
+        `;
+        
+        const deptNames = {1: 'IT', 2: 'LANG', 3: 'BUS', 4: 'GD'};
+        document.getElementById('overdueBody').innerHTML = overdueStudents.map(s => {
+            const lastPayment = allPayments.filter(p => p.studentId === s.id).sort((a,b) => new Date(b.paymentDate) - new Date(a.paymentDate))[0];
+            return `
+                <tr>
+                    <td>${s.name || '-'}</td>
+                    <td>${s.code || '-'}</td>
+                    <td>${s.phone || '-'}</td>
+                    <td>${deptNames[s.deptId] || '-'}</td>
+                    <td style="color: #e74c3c; font-weight: 600;">${(studentBalance[s.id] || 0).toLocaleString()} ج.م</td>
+                    <td>${lastPayment?.paymentDate ? new Date(lastPayment.paymentDate).toLocaleDateString('ar-EG') : 'لا توجد'}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+
+
+    function showLoading(show) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (show) overlay.classList.add('show');
+        else overlay.classList.remove('show');
+    }
+
+    function exportToExcel(btnElement) {
+        // Find the closest report container and then the table
+        const container = btnElement.closest('.report-container');
+        const table = container.querySelector('table');
+        if (!table) return;
+
+        let csv = '\uFEFF'; // Add BOM for Excel Arabic support
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            for (let j = 0; j < cols.length; j++) {
+                // Get text and escape quotes
+                let data = cols[j].innerText.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            csv += row.join(',') + '\n';
+        }
+        
+        // Download
+        const tabName = document.querySelector('.tab-btn.active').innerText.trim() || 'تقرير';
+        const filename = tabName + '_' + new Date().toLocaleDateString('ar-EG') + '.csv';
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+</script>
+
+
+<script src="sidebar.js">
+    function exportToExcel(btnElement) {
+        // Find the closest report container and then the table
+        const container = btnElement.closest('.report-container');
+        const table = container.querySelector('table');
+        if (!table) return;
+
+        let csv = '\uFEFF'; // Add BOM for Excel Arabic support
+        const rows = table.querySelectorAll('tr');
+        
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll('td, th');
+            for (let j = 0; j < cols.length; j++) {
+                // Get text and escape quotes
+                let data = cols[j].innerText.replace(/"/g, '""');
+                row.push('"' + data + '"');
+            }
+            csv += row.join(',') + '\n';
+        }
+        
+        // Download
+        const tabName = document.querySelector('.tab-btn.active').innerText.trim() || 'تقرير';
+        const filename = tabName + '_' + new Date().toLocaleDateString('ar-EG') + '.csv';
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+</script>
+
+</body>
+</html>
