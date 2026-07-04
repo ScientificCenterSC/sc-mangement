@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Scientific Center | إدارة المدفوعات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --dark-blue: #1a2a6c; --medium-blue: #2a4a9c; --primary-blue: #3c6ec8;
+            --light-blue: #4a8fe0; --gold: #f4a261; --gold-dark: #e76f51;
+            --white: #ffffff; --light-gray: #f8f9fa; --gray: #6c757d;
+            --dark: #1e2a3e; --danger: #e74c3c; --success: #2ecc71;
+            --warning: #f39c12; --info: #3498db; --sidebar-width: 270px; --header-height: 65px;
+        }
+        body { font-family: 'Cairo', sans-serif; background: var(--light-gray); overflow-x: hidden; }
+        .app-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar { width: var(--sidebar-width); background: linear-gradient(180deg, var(--dark-blue) 0%, var(--medium-blue) 100%); color: white; position: fixed; height: 100vh; overflow-y: auto; transition: all 0.3s; z-index: 100; }
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        .sidebar-logo { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; }
+        .sidebar-logo .logo-icon { width: 55px; height: 55px; background: rgba(255,255,255,0.15); border-radius: 18px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+        .sidebar-logo .logo-icon i { font-size: 28px; color: var(--gold); }
+        .sidebar-logo h3 { font-size: 18px; margin-bottom: 3px; }
+        .sidebar-logo p { font-size: 10px; opacity: 0.7; }
+        .user-info { padding: 15px 20px; background: rgba(255,255,255,0.08); margin: 15px; border-radius: 16px; text-align: center; }
+        .user-avatar { width: 50px; height: 50px; background: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; }
+        .user-avatar i { font-size: 24px; color: var(--dark-blue); }
+        .user-name { font-weight: 700; font-size: 14px; }
+        .user-role { font-size: 11px; color: var(--gold); margin-top: 5px; }
+        .nav-menu { list-style: none; padding: 0 15px; }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 12px; transition: all 0.3s; font-size: 14px; }
+        .nav-link:hover { background: rgba(255,255,255,0.1); color: white; }
+        .nav-link.active { background: var(--gold); color: var(--dark-blue); font-weight: 600; }
+        .nav-link i { width: 22px; text-align: center; font-size: 16px; }
+
+        /* Main */
+        .main-content { flex: 1; margin-right: var(--sidebar-width); min-height: 100vh; }
+        .top-header { background: var(--white); padding: 0 25px; height: var(--header-height); display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 99; }
+        .page-title h2 { font-size: 20px; font-weight: 700; color: var(--dark-blue); }
+        .page-title p { font-size: 12px; color: var(--gray); margin-top: 2px; }
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .logout-btn { background: none; border: none; color: var(--danger); cursor: pointer; font-size: 14px; padding: 8px 15px; border-radius: 10px; display: flex; align-items: center; gap: 8px; font-family: inherit; }
+        .logout-btn:hover { background: #fdecea; }
+        .menu-toggle { display: none; background: none; border: none; font-size: 22px; color: var(--dark-blue); cursor: pointer; }
+        .content-area { padding: 25px; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--white); border-radius: 18px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-right: 4px solid var(--gold); display: flex; justify-content: space-between; align-items: center; }
+        .stat-info .stat-value { font-size: 22px; font-weight: 800; color: var(--dark-blue); }
+        .stat-info .stat-label { color: var(--gray); font-size: 11px; margin-top: 4px; }
+        .stat-icon { width: 46px; height: 46px; background: linear-gradient(135deg, var(--light-blue), var(--primary-blue)); border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .stat-icon i { font-size: 22px; color: white; }
+
+        /* Charts */
+        .charts-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .chart-card { background: var(--white); border-radius: 18px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e9ecef; }
+        .chart-header h3 { font-size: 15px; color: var(--dark-blue); }
+        canvas { max-height: 200px; }
+
+        /* Toolbar */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+        .search-box { display: flex; gap: 8px; flex: 1; max-width: 380px; }
+        .search-box input { flex: 1; padding: 11px 15px; border: 2px solid #e9ecef; border-radius: 12px; font-family: inherit; font-size: 14px; transition: border-color 0.2s; }
+        .search-box input:focus { outline: none; border-color: var(--primary-blue); }
+        .search-box button { padding: 11px 18px; background: var(--primary-blue); color: white; border: none; border-radius: 12px; cursor: pointer; font-family: inherit; }
+        .btn-add { padding: 11px 22px; background: linear-gradient(135deg, var(--success), #27ae60); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; font-family: inherit; font-size: 14px; transition: all 0.2s; }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(46,204,113,0.4); }
+
+        /* Filters */
+        .filters { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; background: var(--white); padding: 15px 20px; border-radius: 14px; box-shadow: 0 1px 5px rgba(0,0,0,0.04); }
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-size: 12px; color: var(--gray); white-space: nowrap; font-weight: 600; }
+        .filter-group select { padding: 7px 10px; border: 2px solid #e9ecef; border-radius: 9px; font-family: inherit; font-size: 13px; cursor: pointer; background: white; transition: border-color 0.2s; }
+        .filter-group select:focus { outline: none; border-color: var(--primary-blue); }
+
+        /* Table */
+        .payments-table-container { background: var(--white); border-radius: 18px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .payments-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .payments-table th { text-align: right; padding: 14px 12px; background: var(--dark-blue); color: white; font-weight: 600; font-size: 12px; white-space: nowrap; }
+        .payments-table th:first-child { border-radius: 0 0 0 0; }
+        .payments-table td { padding: 12px; border-bottom: 1px solid #f0f2f5; font-size: 13px; }
+        .payments-table tr:last-child td { border-bottom: none; }
+        .payments-table tbody tr:hover { background: #f8faff; }
+
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .status-paid { background: #d4edda; color: #155724; }
+        .status-partial { background: #fff3cd; color: #856404; }
+        .status-unpaid { background: #f8d7da; color: #721c24; }
+
+        .action-buttons { display: flex; gap: 6px; }
+        .btn-icon { padding: 5px 10px; border: none; border-radius: 7px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+        .btn-view { background: var(--info); color: white; }
+        .btn-delete { background: var(--danger); color: white; }
+        .btn-icon:hover { opacity: 0.85; transform: scale(1.05); }
+
+        /* Modal */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: var(--white); border-radius: 22px; width: 92%; max-width: 620px; max-height: 88vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.25); }
+        .modal-header { padding: 18px 22px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, var(--dark-blue), var(--medium-blue)); border-radius: 22px 22px 0 0; }
+        .modal-header h3 { color: white; font-size: 16px; }
+        .close-modal { background: rgba(255,255,255,0.15); border: none; font-size: 20px; cursor: pointer; color: white; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .close-modal:hover { background: rgba(255,255,255,0.3); }
+        .modal-body { padding: 22px; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; margin-bottom: 6px; font-weight: 700; font-size: 13px; color: var(--dark); }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 2px solid #e9ecef; border-radius: 10px; font-family: inherit; font-size: 14px; transition: border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary-blue); }
+        .modal-footer { padding: 16px 22px; border-top: 1px solid #e9ecef; display: flex; justify-content: flex-end; gap: 10px; background: #f8f9fa; border-radius: 0 0 22px 22px; }
+        .btn-save { padding: 10px 24px; background: linear-gradient(135deg, var(--success), #27ae60); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .btn-cancel { padding: 10px 20px; background: #e9ecef; color: var(--gray); border: none; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 14px; }
+        .btn-back { padding: 10px 20px; background: var(--info); color: white; border: none; border-radius: 10px; cursor: pointer; font-family: inherit; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+
+        /* Steps */
+        .step-indicator { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+        .step-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+        .step-dot.active { background: var(--primary-blue); color: white; }
+        .step-dot.done { background: var(--success); color: white; }
+        .step-dot.inactive { background: #e9ecef; color: var(--gray); }
+        .step-line { flex: 1; height: 2px; background: #e9ecef; }
+        .step-line.done { background: var(--success); }
+
+        /* Student search results */
+        .student-result-item { padding: 12px 15px; cursor: pointer; border: 1.5px solid #e9ecef; border-radius: 10px; margin-bottom: 8px; transition: all 0.15s; background: white; }
+        .student-result-item:hover { background: #f0f4ff; border-color: var(--primary-blue); transform: translateX(-3px); }
+        .student-result-name { font-weight: 700; color: var(--dark-blue); font-size: 14px; }
+        .student-result-meta { font-size: 12px; color: var(--gray); margin-top: 3px; }
+
+        /* Category buttons */
+        .cat-btn { flex: 1; padding: 20px; border: 2px solid #e9ecef; border-radius: 14px; cursor: pointer; background: white; transition: all 0.2s; text-align: center; }
+        .cat-btn:hover, .cat-btn.selected { border-color: var(--primary-blue); background: #f0f4ff; transform: translateY(-2px); box-shadow: 0 4px 15px rgba(60,110,200,0.15); }
+        .cat-btn.addon:hover, .cat-btn.addon.selected { border-color: var(--gold); background: #fff8f0; box-shadow: 0 4px 15px rgba(244,162,97,0.2); }
+
+        /* Level buttons */
+        .level-btn { flex: 1; min-width: 85px; max-width: 120px; padding: 14px 10px; border-radius: 12px; cursor: pointer; text-align: center; transition: all 0.2s; border: 2px solid #e9ecef; background: white; }
+        .level-btn:hover { transform: scale(1.07); box-shadow: 0 4px 15px rgba(0,0,0,0.12); }
+
+        /* Loading */
+        .loading-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255,255,255,0.92); display: none; align-items: center; justify-content: center; z-index: 2000; flex-direction: column; gap: 15px; }
+        .loading-overlay.show { display: flex; }
+        .loading-spinner { width: 50px; height: 50px; border: 4px solid #e9ecef; border-top-color: var(--primary-blue); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .loading-text { color: var(--dark-blue); font-weight: 700; font-size: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast */
+        .toast-container { position: fixed; top: 20px; left: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { padding: 14px 22px; border-radius: 14px; color: white; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 10px; animation: toastIn 0.3s ease; box-shadow: 0 8px 25px rgba(0,0,0,0.15); max-width: 380px; font-family: inherit; }
+        .toast-success { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+        .toast-error { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+        .toast-warning { background: linear-gradient(135deg, #f39c12, #e67e22); }
+        .toast-info { background: linear-gradient(135deg, #3498db, #2980b9); }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* Pay mode radio */
+        .pay-mode-group { display: flex; gap: 10px; }
+        .pay-mode-btn { flex: 1; padding: 12px; border: 2px solid #e9ecef; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; font-family: inherit; font-size: 14px; background: white; }
+        .pay-mode-btn:hover { border-color: var(--primary-blue); background: #f0f4ff; }
+        .pay-mode-btn input[type="radio"] { accent-color: var(--primary-blue); }
+
+        .remaining-preview { padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: center; font-weight: 700; display: none; border: 2px solid; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); position: fixed; z-index: 1000; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-right: 0; }
+            .menu-toggle { display: block; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { max-width: 100%; }
+            .content-area { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">جاري التحميل...</div>
+</div>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Scientific Center</h3>
+            <p>نظام إدارة الكورسات</p>
+        </div>
+        <div class="user-info">
+            <div class="user-avatar"><i class="fas fa-user"></i></div>
+            <div class="user-name" id="userName"></div>
+            <div class="user-role" id="userRole"></div>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="dashboard.html" class="nav-link"><i class="fas fa-tachometer-alt"></i><span>الرئيسية</span></a></li>
+            <li class="nav-item"><a href="students.html" class="nav-link"><i class="fas fa-users"></i><span>الطلاب</span></a></li>
+            <li class="nav-item"><a href="trainers.html" class="nav-link"><i class="fas fa-chalkboard-user"></i><span>المدربين</span></a></li>
+            <li class="nav-item"><a href="schedule.html" class="nav-link"><i class="fas fa-calendar-alt"></i><span>الجدول</span></a></li>
+            <li class="nav-item"><a href="payments.html" class="nav-link active"><i class="fas fa-money-bill-wave"></i><span>المدفوعات</span></a></li>
+            <li class="nav-item"><a href="reports.html" class="nav-link"><i class="fas fa-chart-line"></i><span>التقارير</span></a></li>
+            <li class="nav-item"><a href="settings.html" class="nav-link"><i class="fas fa-cog"></i><span>الإعدادات</span></a></li>
+        </ul>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            <div class="page-title">
+                <h2><i class="fas fa-money-bill-wave" style="color:var(--gold);margin-left:8px;"></i>إدارة المدفوعات</h2>
+                <p>تسجيل المدفوعات ومتابعة الأقساط</p>
+            </div>
+            <div class="header-actions">
+                <div id="connectionStatus" style="font-size:12px;color:var(--gray);display:flex;align-items:center;gap:5px;">
+                    <i class="fas fa-circle" style="font-size:8px;color:orange;" id="statusDot"></i>
+                    <span id="statusText">جاري الاتصال...</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>خروج</span></button>
+            </div>
+        </header>
+
+        <div class="content-area">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalPaid">--</div>
+                        <div class="stat-label">إجمالي المدفوعات</div>
+                    </div>
+                    <div class="stat-icon"><i class="fas fa-dollar-sign"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalRemaining">--</div>
+                        <div class="stat-label">المتبقي على الطلاب</div>
+                    </div>
+                    <div class="stat-icon" style="background:linear-gradient(135deg,#e74c3c,#c0392b)"><i class="fas fa-clock"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalStudents">--</div>
+                        <div class="stat-label">إجمالي الطلاب</div>
+                    </div>
+                    <div class="stat-icon" style="background:linear-gradient(135deg,#2ecc71,#27ae60)"><i class="fas fa-user-graduate"></i></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalFees">--</div>
+                        <div class="stat-label">إجمالي الرسوم المطلوبة</div>
+                    </div>
+                    <div class="stat-icon" style="background:linear-gradient(135deg,#f39c12,#e67e22)"><i class="fas fa-coins"></i></div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <div class="chart-header"><h3><i class="fas fa-chart-pie" style="color:var(--primary-blue);"></i> توزيع المدفوعات</h3></div>
+                    <canvas id="paymentChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-header"><h3><i class="fas fa-chart-line" style="color:var(--success);"></i> الإيرادات الشهرية</h3></div>
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 بحث باسم الطالب أو الكود...">
+                    <button id="searchBtn"><i class="fas fa-search"></i></button>
+                </div>
+                <button class="btn-add" id="addPaymentBtn"><i class="fas fa-plus"></i> إضافة دفعة فردية</button>
+                <button class="btn-secondary" id="bulkPaymentBtn" style="background-color: var(--primary-blue); color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: 500; cursor: pointer;"><i class="fas fa-users"></i> دفع دفعة واحدة</button>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters">
+                <div class="filter-group">
+                    <label><i class="fas fa-building"></i> القسم:</label>
+                    <select id="deptFilter"><option value="all">الكل</option></select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-layer-group"></i> المستوى:</label>
+                    <select id="levelFilter">
+                        <option value="all">الكل</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-book"></i> البرنامج:</label>
+                    <select id="programFilter"><option value="all">الكل</option></select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-users-viewfinder"></i> الجروب:</label>
+                    <select id="groupFilter"><option value="all">الكل</option></select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fas fa-filter"></i> حالة الدفع:</label>
+                    <select id="statusFilter">
+                        <option value="all">الكل</option>
+                        <option value="paid">مدفوع بالكامل</option>
+                        <option value="partial">مدفوع جزئياً</option>
+                        <option value="unpaid">غير مدفوع</option>
+                    </select>
+                </div>
+                <button onclick="clearFilters()" style="padding:7px 14px;background:#f0f4ff;color:var(--primary-blue);border:1.5px solid var(--primary-blue);border-radius:9px;cursor:pointer;font-family:inherit;font-size:12px;font-weight:700;">
+                    <i class="fas fa-times"></i> مسح الفلاتر
+                </button>
+            </div>
+
+            <!-- Table -->
+            <div class="payments-table-container">
+                <table class="payments-table">
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>الطالب</th>
+                            <th>المستوى/الإضافة</th>
+                            <th>رقم الإيصال</th>
+                            <th>إجمالي المدفوع</th>
+                            <th>الخصم</th>
+                            <th>رسوم المستوى</th>
+                            <th>المتبقي</th>
+                            <th>الحالة</th>
+                            <th>آخر دفعة</th>
+                            <th>إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        <tr><td colspan="12" style="text-align:center;padding:40px;color:var(--gray);">
+                            <i class="fas fa-spinner fa-spin" style="font-size:24px;margin-bottom:10px;display:block;"></i>
+                            جاري التحميل...
+                        </td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bulk Payment Modal -->
+    <div class="modal" id="bulkPaymentModal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3 id="bulkModalTitle">دفع مجمع لطلاب الجروب</h3>
+                <button class="close-btn" id="closeBulkModal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القسم</label>
+                        <select id="bulkDeptFilter">
+                            <option value="">اختر القسم</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>المستوى</label>
+                        <select id="bulkLevelFilter">
+                            <option value="">اختر المستوى</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الكورس</label>
+                        <select id="bulkCourseFilter">
+                            <option value="">اختر الكورس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>الجروب</label>
+                        <select id="bulkGroupFilter">
+                            <option value="">اختر الجروب</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bulk-students-container" style="margin-top: 20px; max-height: 400px; overflow-y: auto;">
+                    <table class="data-table" id="bulkStudentsTable">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="selectAllBulk" checked></th>
+                                <th>اسم الطالب</th>
+                                <th>الكود</th>
+                                <th>سابق الدفع</th>
+                                <th>دفعة إضافية</th>
+                                <th>خصم إضافي</th>
+                                <th>رقم الإيصال</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bulkStudentsTableBody">
+                            <tr><td colspan="6" style="text-align: center;">اختر الجروب لظهور الطلاب</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancelBulkModal">إلغاء</button>
+                <button class="btn-primary" id="saveBulkPaymentsBtn"><i class="fas fa-save"></i> حفظ الدفعات</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Payment Modal -->
+<div class="modal" id="paymentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle"><i class="fas fa-money-bill-wave" style="margin-left:8px;"></i>تسجيل دفعة جديدة</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+
+            <!-- Step indicator -->
+            <div class="step-indicator" id="stepIndicator">
+                <div class="step-dot active" id="step-dot-1">1</div>
+                <div class="step-line" id="step-line-1"></div>
+                <div class="step-dot inactive" id="step-dot-2">2</div>
+                <div class="step-line" id="step-line-2"></div>
+                <div class="step-dot inactive" id="step-dot-3">3</div>
+            </div>
+
+            <!-- Step 1: Search Student -->
+            <div id="step1">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>القسم</label>
+                        <select id="singleDeptFilter"><option value="">اختر القسم</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>المستوى</label>
+                        <select id="singleLevelFilter"><option value="">اختر المستوى</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>الكورس</label>
+                        <select id="singleCourseFilter"><option value="">اختر الكورس</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label>الجروب</label>
+                        <select id="singleGroupFilter"><option value="">اختر الجروب</option></select>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-top:15px;">
+                    <label>الطالب</label>
+                    <select id="singleStudentFilter"><option value="">اختر الطالب</option></select>
+                </div>
+            </div>
+
+            <!-- Step 2: Choose category -->
+            <div id="step2" style="display:none;">
+                <div id="studentInfoBar" style="background:linear-gradient(135deg,#1a2a6c,#2a4a9c);color:white;padding:15px;border-radius:12px;margin-bottom:20px;">
+                    <div style="font-size:16px;font-weight:700;" id="selectedStudentDisplay"></div>
+                    <div style="font-size:13px;opacity:0.8;margin-top:4px;" id="selectedStudentCourse"></div>
+                </div>
+                <p style="font-weight:700;margin-bottom:12px;color:var(--dark-blue);">اختر نوع الدفعة:</p>
+                <div style="display:flex;gap:12px;">
+                    <button class="cat-btn" id="btnPayLevel" onclick="choosePaymentCategory('level')">
+                        <i class="fas fa-graduation-cap" style="font-size:28px;color:var(--primary-blue);display:block;margin-bottom:10px;"></i>
+                        <div style="font-weight:700;font-size:15px;">دفع كورس / مستوى</div>
+                        <div style="font-size:12px;color:#666;margin-top:5px;">دفع قسط مستوى من الكورس</div>
+                    </button>
+                    <button class="cat-btn addon" id="btnPayAddon" onclick="choosePaymentCategory('addon')">
+                        <i class="fas fa-plus-circle" style="font-size:28px;color:var(--gold);display:block;margin-bottom:10px;"></i>
+                        <div style="font-weight:700;font-size:15px;">دفع إضافة (AddOn)</div>
+                        <div style="font-size:12px;color:#666;margin-top:5px;">دفع مقابل خدمة إضافية</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3A: Level Payment -->
+            <div id="step3Level" style="display:none;">
+                <div id="studentInfoBar2" style="background:linear-gradient(135deg,#1a2a6c,#2a4a9c);color:white;padding:12px 15px;border-radius:12px;margin-bottom:15px;font-size:14px;font-weight:700;" id="step3StudentInfo"></div>
+
+                <div style="margin-bottom:15px;">
+                    <label style="font-weight:700;display:block;margin-bottom:10px;color:var(--dark-blue);">
+                        <i class="fas fa-layer-group"></i> اختر المستوى:
+                    </label>
+                    <div id="levelButtons" style="display:flex;flex-wrap:wrap;gap:10px;"></div>
+                </div>
+
+                <div id="levelPaymentDetails" style="display:none;background:#f8f9fa;padding:15px;border-radius:12px;margin-bottom:15px;border:1px solid #e9ecef;">
+                    <div id="levelStatusBanner" style="padding:12px;border-radius:8px;margin-bottom:12px;text-align:center;font-weight:700;font-size:14px;"></div>
+                    <div id="levelPayHistory"></div>
+                </div>
+
+                <div id="levelPayForm" style="display:none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i class="fas fa-coins"></i> إجمالي رسوم المستوى</label>
+                            <input type="number" id="totalLevelFee" min="0" oninput="updateRemainingPreview()">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-hand-holding-usd"></i> مدفوع مسبقاً</label>
+                            <input type="number" id="paidBefore" readonly style="background:#e9ecef;color:#6c757d;">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-exclamation-triangle"></i> المتبقي حالياً</label>
+                            <input type="number" id="currentRemaining" readonly style="background:#fff3e0;color:#e65100;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-weight:700;display:block;margin-bottom:8px;font-size:13px;">طريقة الدفع:</label>
+                        <div class="pay-mode-group">
+                            <label class="pay-mode-btn">
+                                <input type="radio" name="payMode" value="full" onchange="onPayModeChange()"> دفع كامل
+                            </label>
+                            <label class="pay-mode-btn">
+                                <input type="radio" name="payMode" value="partial" onchange="onPayModeChange()"> دفع جزئي
+                            </label>
+                        </div>
+                        <div class="form-group" style="display:none;">
+                            <label>المتبقي</label>
+                            <input type="number" id="remainingBalance" readonly>
+                        </div>
+                        <input type="hidden" id="editPaymentId" value="">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-money-bill"></i> المبلغ المدفوع (ج.م) *</label>
+                        <input type="number" id="amountPaid" placeholder="0" min="0" oninput="updateRemainingPreview()">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-receipt"></i> رقم الإيصال *</label>
+                        <input type="text" id="receiptNumber" placeholder="رقم الإيصال" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-tag"></i> خصم (ج.م) - اختياري</label>
+                        <input type="number" id="discountAmount" placeholder="0" value="0" min="0" oninput="updateRemainingPreview()">
+                    </div>
+                    <div class="remaining-preview" id="remainingPreview"></div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> ملاحظات</label>
+                        <input type="text" id="notes" placeholder="ملاحظات إضافية (اختياري)">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> تاريخ الدفع</label>
+                        <input type="date" id="paymentDate">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3B: AddOn Payment -->
+            <div id="step3Addon" style="display:none;">
+                <div id="studentInfoBar3" style="background:linear-gradient(135deg,#1a2a6c,#2a4a9c);color:white;padding:12px 15px;border-radius:12px;margin-bottom:15px;font-size:14px;font-weight:700;"></div>
+                <p style="font-weight:700;margin-bottom:12px;color:var(--dark-blue);">اختر الإضافة:</p>
+                <div id="addonList" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:15px;"></div>
+                <div id="addonPayForm" style="display:none;">
+                    <div id="addonSelectedInfo" style="background:#fff3e0;padding:12px;border-radius:10px;margin-bottom:12px;font-weight:700;border:1.5px solid var(--gold);"></div>
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> تاريخ الدفع</label>
+                        <input type="date" id="addonPaymentDate">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-receipt"></i> رقم الإيصال *</label>
+                        <input type="text" id="addonReceiptNumber" placeholder="رقم الإيصال" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-sticky-note"></i> ملاحظات</label>
+                        <input type="text" id="addonNotes" placeholder="ملاحظات">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" id="cancelModal">إلغاء</button>
+            <button class="btn-back" id="backBtn" style="display:none;" onclick="goBack()"><i class="fas fa-arrow-right"></i> رجوع</button>
+            <button class="btn-save" id="savePayment" style="display:none;" onclick="completePayment()">
+                <i class="fas fa-save"></i> تسجيل الدفعة
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwIqJ0hC7xzs4I6--ocDyCHkwxwmVUk-Y0eOwYsTUCiP39MH2oetro_9ssGTniJOztRjw/exec';
+
+    let currentUser = null;
+    let allPayments = [];
+    let allStudents = [];
+    let allCourses = [];
+    let allGroups = [];
+    let allAddOns = [];
+    let allDepts = [];
+    let allFloors = [];
+    let paymentChart, revenueChart;
+
+    // Modal state
+    let selectedStudentId = null;
+    let selectedLevelNumber = null;
+    let selectedAddonId = null;
+    let paymentCategory = null;
+    let currentStep = 1;
+
+    // =================== UTILS ===================
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i><span>${message}</span>`;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 4500);
+    }
+
+    function showLoading(show, text = 'جاري التحميل...') {
+        const overlay = document.getElementById('loadingOverlay');
+        const textEl = overlay.querySelector('.loading-text');
+        if (textEl) textEl.textContent = text;
+        overlay.classList.toggle('show', show);
+    }
+
+    function setStatus(ok, text) {
+        const dot = document.getElementById('statusDot');
+        const txt = document.getElementById('statusText');
+        if (dot) dot.style.color = ok ? '#2ecc71' : '#e74c3c';
+        if (txt) txt.textContent = text;
+    }
+
+    // =================== API ===================
+
+    async function apiCall(action, data = {}) {
+        const body = JSON.stringify({ action, ...data });
+        const response = await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const result = await response.json();
+        if (result.success === false) throw new Error(result.message || 'خطأ من الخادم');
+        return result.data !== undefined ? result.data : result;
+    }
+
+    async function safeApiCall(action, data = {}, fallback = []) {
+        try {
+            const result = await apiCall(action, data);
+            return result || fallback;
+        } catch (e) {
+            console.warn(`[${action}] failed:`, e.message);
+            return fallback;
+        }
+    }
+
+    // =================== INIT ===================
+    
+    // Bulk Payment Elements
+    const bulkPaymentBtn = document.getElementById('bulkPaymentBtn');
+    const bulkPaymentModal = document.getElementById('bulkPaymentModal');
+    const closeBulkModalBtn = document.getElementById('closeBulkModal');
+    const cancelBulkModalBtn = document.getElementById('cancelBulkModal');
+    const bulkDeptFilter = document.getElementById('bulkDeptFilter');
+    const bulkCourseFilter = document.getElementById('bulkCourseFilter');
+    const bulkGroupFilter = document.getElementById('bulkGroupFilter');
+    const bulkLevelFilter = document.getElementById('bulkLevelFilter');
+    const bulkStudentsTableBody = document.getElementById('bulkStudentsTableBody');
+    const selectAllBulk = document.getElementById('selectAllBulk');
+    const saveBulkPaymentsBtn = document.getElementById('saveBulkPaymentsBtn');
+
+    if (bulkPaymentBtn) {
+        bulkPaymentBtn.addEventListener('click', () => {
+            bulkDeptFilter.innerHTML = '<option value="">اختر القسم</option>';
+            allDepts.forEach(d => bulkDeptFilter.innerHTML += `<option value="${d.id}">${d.name}</option>`);
+            bulkCourseFilter.innerHTML = '<option value="">اختر الكورس</option>';
+            bulkGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            bulkLevelFilter.innerHTML = '<option value="">اختر المستوى</option>';
+            bulkStudentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">اختر القسم والكورس والجروب لظهور الطلاب</td></tr>';
+            bulkPaymentModal.style.display = 'flex';
+        });
+    }
+    
+    if (closeBulkModalBtn) closeBulkModalBtn.addEventListener('click', () => bulkPaymentModal.style.display = 'none');
+    if (cancelBulkModalBtn) cancelBulkModalBtn.addEventListener('click', () => bulkPaymentModal.style.display = 'none');
+
+    if (bulkDeptFilter) {
+        bulkDeptFilter.addEventListener('change', () => {
+            const deptId = bulkDeptFilter.value;
+            bulkCourseFilter.innerHTML = '<option value="">اختر الكورس</option>';
+            bulkGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            bulkLevelFilter.innerHTML = '<option value="">اختر المستوى</option>';
+            if (deptId) {
+                const courses = allCourses.filter(c => c.deptId == deptId);
+                courses.forEach(c => bulkCourseFilter.innerHTML += `<option value="${c.id}">${c.courseName||c.name}</option>`);
+            }
+            renderBulkStudents();
+        });
+    }
+
+    if (bulkCourseFilter) {
+        bulkCourseFilter.addEventListener('change', () => {
+            const courseId = bulkCourseFilter.value;
+            bulkGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            bulkLevelFilter.innerHTML = '<option value="">اختر المستوى</option>';
+            if (courseId) {
+                const groups = allGroups.filter(g => g.courseId == courseId);
+                groups.forEach(g => bulkGroupFilter.innerHTML += `<option value="${g.id}">${g.name}</option>`);
+                
+                const course = allCourses.find(c => String(c.id) === String(courseId));
+                let levelsHtml = '';
+                if (course) {
+                    const durationLevels = parseInt(course.durationLevels) || parseInt(course.levels) || 1;
+                    levelsHtml += '<optgroup label="مستويات الكورس">';
+                    for(let i=1; i<=durationLevels; i++) {
+                        levelsHtml += `<option value="course_${i}">مستوى ${i}</option>`;
+                    }
+                    levelsHtml += '</optgroup>';
+                }
+                
+                const relevantAddons = allAddOns.filter(a => !a.courseId || String(a.courseId) === String(courseId));
+                if (relevantAddons.length > 0) {
+                    levelsHtml += '<optgroup label="إضافات (Add-ons)">';
+                    relevantAddons.forEach(a => {
+                        levelsHtml += `<option value="addon_${a.id}">${a.name} (${a.price || 0})</option>`;
+                    });
+                    levelsHtml += '</optgroup>';
+                }
+                bulkLevelFilter.innerHTML += levelsHtml;
+            }
+            renderBulkStudents();
+        });
+    }
+
+    if (bulkGroupFilter) bulkGroupFilter.addEventListener('change', renderBulkStudents);
+    if (bulkLevelFilter) bulkLevelFilter.addEventListener('change', renderBulkStudents);
+
+    function renderBulkStudents() {
+        const groupId = bulkGroupFilter.value;
+        const levelVal = bulkLevelFilter.value;
+        
+        let targetLevel = null;
+        let paymentType = null;
+        if (levelVal) {
+            if (levelVal.startsWith('course_')) {
+                paymentType = 'Course Payment';
+                targetLevel = levelVal.replace('course_', '');
+            } else if (levelVal.startsWith('addon_')) {
+                paymentType = 'AddOn Payment';
+                targetLevel = levelVal.replace('addon_', '');
+            }
+        }
+        
+        if (!groupId) {
+            bulkStudentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">اختر الجروب لظهور الطلاب</td></tr>';
+            return;
+        }
+
+        const students = allStudents.filter(s => String(s.groupId) === String(groupId));
+        if (students.length === 0) {
+            bulkStudentsTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">لا يوجد طلاب في هذا الجروب</td></tr>';
+            return;
+        }
+
+        // Calculate previous paid for this level for each student if level is selected
+        const prevPaidMap = {};
+        if (targetLevel && paymentType) {
+            allPayments.forEach(p => {
+                if (String(p.levelNumber) === String(targetLevel) && p.paymentType === paymentType) {
+                    if (!prevPaidMap[p.studentId]) prevPaidMap[p.studentId] = { paid: 0, discount: 0 };
+                    prevPaidMap[p.studentId].paid += parseFloat(p.amountPaid) || 0;
+                    prevPaidMap[p.studentId].discount += parseFloat(p.discountAmount) || 0;
+                }
+            });
+        }
+
+        bulkStudentsTableBody.innerHTML = students.map(s => {
+            let prevText = 'يرجى تحديد المستوى / الإضافة';
+            if (targetLevel) {
+                const prev = prevPaidMap[s.id] || { paid: 0, discount: 0 };
+                prevText = prev.paid > 0 ? `دفع: ${prev.paid} | خصم: ${prev.discount}` : 'لم يدفع';
+            }
+            return `<tr>
+                <td><input type="checkbox" class="bulk-student-check" value="${s.id}" checked></td>
+                <td>${s.name}</td>
+                <td>${s.code || '-'}</td>
+                <td style="font-size: 12px; color: var(--gray);">${prevText}</td>
+                <td><input type="number" class="bulk-amount" data-id="${s.id}" placeholder="0" style="width: 80px; padding: 5px;"></td>
+                <td><input type="number" class="bulk-discount" data-id="${s.id}" placeholder="0" style="width: 80px; padding: 5px;"></td>
+                <td><input type="text" class="bulk-receipt" data-id="${s.id}" placeholder="الإيصال" style="width: 100px; padding: 5px;"></td>
+            </tr>`;
+        }).join('');
+    }
+
+    if (selectAllBulk) {
+        selectAllBulk.addEventListener('change', (e) => {
+            const checks = document.querySelectorAll('.bulk-student-check');
+            checks.forEach(c => c.checked = e.target.checked);
+        });
+    }
+
+    if (saveBulkPaymentsBtn) {
+        saveBulkPaymentsBtn.addEventListener('click', async () => {
+            const groupId = bulkGroupFilter.value;
+            const levelVal = bulkLevelFilter.value;
+            const courseId = bulkCourseFilter.value;
+            
+            if (!groupId || !levelVal) return showToast('الرجاء تحديد الجروب والمستوى / الإضافة', 'warning');
+            
+            let targetLevel = null;
+            let paymentType = null;
+            let totalFee = 0;
+            
+            if (levelVal.startsWith('course_')) {
+                paymentType = 'Course Payment';
+                targetLevel = levelVal.replace('course_', '');
+                const course = allCourses.find(c => String(c.id) === String(courseId));
+                totalFee = course ? (parseFloat(course.pricePerLevel) || 0) : 0;
+            } else if (levelVal.startsWith('addon_')) {
+                paymentType = 'AddOn Payment';
+                targetLevel = levelVal.replace('addon_', '');
+                const addon = allAddOns.find(a => String(a.id) === String(targetLevel));
+                totalFee = addon ? (parseFloat(addon.price) || 0) : 0;
+            }
+            
+            const payments = [];
+            const checks = document.querySelectorAll('.bulk-student-check:checked');
+            checks.forEach(c => {
+                const sid = c.value;
+                const amountInput = document.querySelector(`.bulk-amount[data-id="${sid}"]`).value;
+                const discountInput = document.querySelector(`.bulk-discount[data-id="${sid}"]`).value;
+                const receiptInput = document.querySelector(`.bulk-receipt[data-id="${sid}"]`).value;
+                
+                const amt = parseFloat(amountInput) || 0;
+                const disc = parseFloat(discountInput) || 0;
+                
+                if (amt > 0 || disc > 0) {
+                    payments.push({
+                        studentId: parseInt(sid),
+                        levelNumber: targetLevel,
+                        paymentType: paymentType,
+                        totalLevelFee: totalFee,
+                        amountPaid: amt,
+                        discountAmount: disc,
+                        receiptNumber: receiptInput,
+                        notes: 'Bulk Payment',
+                        paymentDate: new Date().toISOString().substring(0, 10)
+                    });
+                }
+            });
+
+            if (payments.length === 0) {
+                return showToast('الرجاء إدخال مبالغ مدفوعة للطلاب المحددين', 'warning');
+            }
+
+            bulkPaymentModal.style.display = 'none';
+            showLoading(true, 'جاري حفظ الدفعات المجمعة...');
+            const result = await safeApiCall('bulkSavePayments', { payments: payments }, null);
+            if (result && result.success) {
+                showToast('تم حفظ الدفعات بنجاح', 'success');
+                loadData();
+            } else {
+                showToast(result?.message || 'حدث خطأ أثناء الحفظ', 'error');
+            }
+            showLoading(false);
+        });
+    }
+
+    window.editPayment = function(id) {
+        const p = allPayments.find(pay => String(pay.id) === String(id));
+        if (!p) return;
+        
+        document.getElementById('editPaymentId').value = p.id;
+        document.getElementById('modalTitle').textContent = 'تعديل الدفعة';
+        
+        openAddPaymentModal(); 
+        hide('step1'); hide('step2'); show('step3');
+        
+        document.getElementById('amountPaid').value = p.amountPaid || 0;
+        document.getElementById('discountAmount').value = p.discountAmount || 0;
+        document.getElementById('receiptNumber').value = p.receipt_number || p.receiptNumber || '';
+        document.getElementById('notes').value = p.notes || '';
+        document.getElementById('paymentDate').value = p.paymentDate ? new Date(p.paymentDate).toISOString().substring(0, 10) : new Date().toISOString().substring(0, 10);
+        
+        selectedStudent = allStudents.find(s => String(s.id) === String(p.studentId));
+        paymentCategory = (p.paymentType === 'Course Payment') ? 'course' : 'addon';
+        if (paymentCategory === 'course') {
+            selectedLevelNumber = p.levelNumber;
+            document.getElementById('totalLevelFee').value = p.totalLevelFee || p.totalFee || 0;
+        } else {
+            selectedAddonId = p.levelNumber; 
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const userStr = sessionStorage.getItem('loggedInUser');
+        if (!userStr) { window.location.href = 'index.html'; return; }
+        try { currentUser = JSON.parse(userStr); } catch(e) { window.location.href = 'index.html'; return; }
+
+        document.getElementById('userName').textContent = currentUser.fullName || currentUser.username || 'مستخدم';
+        const roleNames = {1:'مدير النظام',2:'محاسب',3:'مدير دور',4:'مسؤول حجوزات',5:'مشاهد'};
+        document.getElementById('userRole').textContent = roleNames[currentUser.roleId] || 'مستخدم';
+
+        document.getElementById('menuToggle').addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+        document.getElementById('logoutBtn').addEventListener('click', () => { sessionStorage.removeItem('loggedInUser'); window.location.href = 'index.html'; });
+        document.getElementById('searchBtn').addEventListener('click', filterAndRender);
+        document.getElementById('searchInput').addEventListener('keypress', e => { if(e.key==='Enter') filterAndRender(); });
+        document.getElementById('statusFilter').addEventListener('change', filterAndRender);
+        document.getElementById('deptFilter').addEventListener('change', () => { updateLevelFilters(); filterAndRender(); });
+        document.getElementById('levelFilter').addEventListener('change', () => { updateProgramFilters(); filterAndRender(); });
+        document.getElementById('programFilter').addEventListener('change', () => { updateGroupFilters(); filterAndRender(); });
+        document.getElementById('groupFilter').addEventListener('change', filterAndRender);
+        document.getElementById('addPaymentBtn').addEventListener('click', openAddPaymentModal);
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('cancelModal').addEventListener('click', closeModal);
+        window.addEventListener('click', e => { if(e.target === document.getElementById('paymentModal')) closeModal(); });
+
+        loadData();
+    });
+
+    // =================== LOAD DATA ===================
+
+    async function loadData() {
+        showLoading(true, 'جاري تحميل البيانات...');
+        setStatus(false, 'جاري الاتصال...');
+
+        try {
+            // Load sequentially to avoid race conditions / quota issues
+            allStudents = await safeApiCall('getAllStudents', {}, []);
+            allPayments = await safeApiCall('getAllPayments', {}, []);
+            allCourses  = await safeApiCall('getAllCourses', {}, []);
+            allGroups   = await safeApiCall('getAllGroups', {}, []);
+            allAddOns   = await safeApiCall('getAllAddOns', {}, []);
+            allDepts    = await safeApiCall('getAllDepartments', {}, []);
+            allFloors   = await safeApiCall('getAllFloors', {}, []);
+
+            setStatus(true, `متصل ✓ (${allPayments.length} دفعة)`);
+
+            // Populate filter dropdowns
+            populateFilters();
+            filterAndRender();
+
+        } catch (error) {
+            console.error('loadData error:', error);
+            setStatus(false, 'خطأ في الاتصال');
+            showToast('خطأ في الاتصال بالخادم: ' + error.message, 'error');
+            document.getElementById('paymentsTableBody').innerHTML =
+                `<tr><td colspan="12" style="text-align:center;padding:40px;color:var(--danger);">
+                    <i class="fas fa-exclamation-triangle" style="font-size:30px;display:block;margin-bottom:10px;"></i>
+                    <strong>خطأ في تحميل البيانات</strong><br>
+                    <small style="color:var(--gray);">${error.message}</small><br><br>
+                    <button onclick="loadData()" style="padding:8px 20px;background:var(--primary-blue);color:white;border:none;border-radius:8px;cursor:pointer;font-family:inherit;">
+                        <i class="fas fa-redo"></i> إعادة المحاولة
+                    </button>
+                </td></tr>`;
+        }
+
+        showLoading(false);
+    }
+
+    // =================== POPULATE FILTERS ===================
+
+    function populateFilters() {
+        const deptSel = document.getElementById('deptFilter');
+
+        if(deptSel) {
+            deptSel.innerHTML = '<option value="all">الكل</option>';
+            allDepts.forEach(d => {
+                deptSel.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+            });
+        }
+        
+        updateLevelFilters();
+        filterAndRender();
+    }
+
+    function updateLevelFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelFilter = document.getElementById('levelFilter');
+        
+        if (levelFilter) {
+            let maxLevels = 0;
+            let filteredCourses = typeof allCourses !== 'undefined' ? allCourses : [];
+            if (deptId !== 'all' && deptId) {
+                filteredCourses = filteredCourses.filter(c => c.deptId == deptId);
+            }
+            
+            filteredCourses.forEach(c => {
+                const lvls = parseInt(c.durationLevels) || 1;
+                if (lvls > maxLevels) maxLevels = lvls;
+            });
+            
+            let levelHtml = '<option value="all">الكل</option>';
+            for (let i = 1; i <= maxLevels; i++) {
+                levelHtml += `<option value="${i}">Level ${i}</option>`;
+            }
+            levelFilter.innerHTML = levelHtml;
+            
+            // Cascade reset
+            const programFilter = document.getElementById('programFilter');
+            if (programFilter) programFilter.innerHTML = '<option value="all">الكل</option>';
+            const groupFilter = document.getElementById('groupFilter');
+            if (groupFilter) groupFilter.innerHTML = '<option value="all">الكل</option>';
+            
+            updateProgramFilters();
+        }
+    }
+
+    function updateProgramFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelId = document.getElementById('levelFilter')?.value;
+        const programFilter = document.getElementById('programFilter');
+        
+        if (programFilter) {
+            let filteredCourses = typeof allCourses !== 'undefined' ? allCourses : [];
+            
+            if (deptId !== 'all' && deptId) {
+                filteredCourses = filteredCourses.filter(c => c.deptId == deptId);
+            }
+            if (levelId !== 'all' && levelId) {
+                const lvl = parseInt(levelId);
+                filteredCourses = filteredCourses.filter(c => (parseInt(c.durationLevels) || 1) >= lvl);
+            }
+            
+            let programHtml = '<option value="all">الكل</option>';
+            filteredCourses.forEach(c => programHtml += `<option value="${c.id}">${c.courseName || c.name}</option>`);
+            programFilter.innerHTML = programHtml;
+            
+            // Cascade reset
+            const groupFilter = document.getElementById('groupFilter');
+            if (groupFilter) groupFilter.innerHTML = '<option value="all">الكل</option>';
+            
+            updateGroupFilters();
+        }
+    }
+
+    function updateGroupFilters() {
+        const deptId = document.getElementById('deptFilter')?.value;
+        const levelId = document.getElementById('levelFilter')?.value;
+        const progId = document.getElementById('programFilter')?.value;
+        
+        const groupFilter = document.getElementById('groupFilter');
+        
+        if (groupFilter) {
+            let filteredGroups = typeof allGroups !== 'undefined' ? allGroups : [];
+            if (deptId !== 'all' && deptId) filteredGroups = filteredGroups.filter(g => g.deptId == deptId);
+            if (levelId !== 'all' && levelId) filteredGroups = filteredGroups.filter(g => String(g.level) === String(levelId));
+            if (progId !== 'all' && progId) filteredGroups = filteredGroups.filter(g => g.courseId == progId);
+            
+            let options = '<option value="all">الكل</option>';
+            filteredGroups.forEach(g => {
+                options += `<option value="${g.id}">${g.name}</option>`;
+            });
+            groupFilter.innerHTML = options;
+        }
+    }
+
+    window.clearFilters = function() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('deptFilter').value = 'all';
+        document.getElementById('levelFilter').value = 'all';
+        document.getElementById('programFilter').value = 'all';
+        document.getElementById('groupFilter').value = 'all';
+        document.getElementById('statusFilter').value = 'all';
+        updateLevelFilters();
+        filterAndRender();
+    };
+
+    // =================== STATS ===================
+
+    function updateStats(rows) {
+        let totalPaid = 0, totalRemaining = 0, totalFees = 0;
+        
+        let validRows = rows || [];
+        
+        validRows.forEach(p => {
+            const paid = parseFloat(p.totalPaid) || 0;
+            const rem = parseFloat(p.remainingBalance) || 0;
+            const fee = parseFloat(p.totalLevelFee) || parseFloat(p.totalFee) || (paid + rem);
+            totalPaid += paid;
+            totalRemaining += rem;
+            totalFees += fee;
+        });
+
+        document.getElementById('totalPaid').textContent = totalPaid.toLocaleString('ar-EG') + ' ج.م';
+        document.getElementById('totalRemaining').textContent = totalRemaining.toLocaleString('ar-EG') + ' ج.م';
+        document.getElementById('totalStudents').textContent = validRows.length;
+        document.getElementById('totalFees').textContent = totalFees.toLocaleString('ar-EG') + ' ج.م';
+    }
+
+    function updateCharts(rows) {
+        let validRows = rows || [];
+        let paid = 0, remaining = 0;
+        validRows.forEach(p => { paid += parseFloat(p.totalPaid)||0; remaining += parseFloat(p.remainingBalance)||0; });
+
+        const ctx1 = document.getElementById('paymentChart');
+        if (paymentChart) paymentChart.destroy();
+        paymentChart = new Chart(ctx1.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['مدفوع', 'متبقي'],
+                datasets: [{ data: [paid, remaining], backgroundColor: ['#2ecc71', '#e74c3c'], borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', rtl: true } } }
+        });
+
+        const ctx2 = document.getElementById('revenueChart');
+        if (revenueChart) revenueChart.destroy();
+        const months = validRows.reduce((acc, p) => {
+            if (p.allAmounts) {
+                p.allAmounts.forEach(amt => {
+                    if (!amt.date) return;
+                    const d = new Date(amt.date);
+                    if (isNaN(d)) return;
+                    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                    acc[key] = (acc[key] || 0) + (parseFloat(amt.amount) || 0);
+                });
+            }
+            return acc;
+        }, {});
+        const sortedKeys = Object.keys(months).sort();
+        const labels = sortedKeys.length > 0 ? sortedKeys : ['لا توجد بيانات'];
+        const values = sortedKeys.length > 0 ? sortedKeys.map(k => months[k]) : [0];
+
+        revenueChart = new Chart(ctx2.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [{ label: 'الإيرادات', data: values, borderColor: '#3c6ec8', tension: 0.3, fill: true, backgroundColor: 'rgba(60,110,200,0.08)', pointBackgroundColor: '#3c6ec8' }]
+            },
+            options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } } }
+        });
+    }
+
+    // =================== FILTER & RENDER ===================
+
+    function filterAndRender() {
+        const searchTerm = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+        const statusFilter = document.getElementById('statusFilter')?.value || 'all';
+        const deptFilterVal = document.getElementById('deptFilter')?.value || 'all';
+        const levelFilterVal = document.getElementById('levelFilter')?.value || 'all';
+        const programFilterVal = document.getElementById('programFilter')?.value || 'all';
+        const groupFilterVal = document.getElementById('groupFilter')?.value || 'all';
+
+        // Group by student + level + type
+        const grouped = {};
+        allPayments.forEach(p => {
+            const key = `${p.studentId}__${p.levelNumber}__${p.paymentType}`;
+            if (!grouped[key]) {
+                grouped[key] = { ...p, allAmounts: [], totalPaid: 0, totalDiscount: 0 };
+            }
+            grouped[key].allAmounts.push({
+                amount: parseFloat(p.amountPaid) || 0,
+                date: p.paymentDate,
+                id: p.id,
+                receipt: p.receipt_number || p.receiptNumber || '-'
+            });
+            grouped[key].totalPaid += parseFloat(p.amountPaid) || 0;
+            grouped[key].totalDiscount += parseFloat(p.discountAmount) || 0;
+            // Always use latest remaining balance
+            if (!grouped[key]._lastId || p.id >= grouped[key]._lastId) {
+                grouped[key]._lastId = p.id;
+                grouped[key].remainingBalance = parseFloat(p.remainingBalance) || 0;
+                grouped[key].totalLevelFee = parseFloat(p.totalLevelFee) || parseFloat(p.totalFee) || 0;
+            }
+        });
+
+        // Add students who haven't paid anything yet for the target level
+        if (typeof allStudents !== 'undefined' && typeof allGroups !== 'undefined' && typeof allCourses !== 'undefined') {
+            const targetLevel = levelFilterVal === 'all' ? '1' : levelFilterVal;
+            allStudents.forEach(s => {
+                if (s.groupId) {
+                    const group = allGroups.find(g => String(g.id) === String(s.groupId));
+                    if (group) {
+                        const course = allCourses.find(c => String(c.id) === String(group.courseId));
+                        if (course) {
+                            const durationLevels = parseInt(course.durationLevels) || 1;
+                            // Only add debt if the target level is within the course's duration
+                            if (parseInt(targetLevel) <= durationLevels) {
+                                // Check if student has ANY payment for this specific target level
+                                const hasPayment = Object.values(grouped).some(p => String(p.studentId) === String(s.id) && String(p.levelNumber) === String(targetLevel));
+                                
+                                if (!hasPayment) {
+                                    const coursePrice = parseFloat(course.pricePerLevel) || 0;
+                                    
+                                    const key = `${s.id}__${targetLevel}__Unpaid`;
+                                    grouped[key] = {
+                                        studentId: s.id,
+                                        studentName: s.name,
+                                        levelNumber: targetLevel,
+                                        paymentType: '-',
+                                        paymentDate: s.createdAt || new Date().toISOString(),
+                                        amountPaid: 0,
+                                        remainingBalance: coursePrice,
+                                        totalLevelFee: coursePrice,
+                                        totalDiscount: 0,
+                                        allAmounts: []
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        let rows = Object.values(grouped);
+
+        // Search
+        if (searchTerm) {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                const name = (p.studentName || s?.name || '').toLowerCase();
+                const code = (s?.code || '').toLowerCase();
+                return name.includes(searchTerm) || code.includes(searchTerm);
+            });
+        }
+
+        // Dept filter
+        if (deptFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                return s && String(s.deptId) === String(deptFilterVal);
+            });
+        }
+
+        // Level filter
+        if (levelFilterVal !== 'all') {
+            rows = rows.filter(p => String(p.levelNumber) === String(levelFilterVal));
+        }
+
+        // Program filter
+        if (programFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                if (!s || !s.groupId) return false;
+                const g = allGroups.find(gr => String(gr.id) === String(s.groupId));
+                return g && String(g.courseId) === String(programFilterVal);
+            });
+        }
+
+        // Group filter
+        if (groupFilterVal !== 'all') {
+            rows = rows.filter(p => {
+                const s = allStudents.find(st => String(st.id) === String(p.studentId));
+                return s && String(s.groupId) === String(groupFilterVal);
+            });
+        }
+
+        // Status filter
+        if (statusFilter === 'paid') {
+            rows = rows.filter(p => p.totalPaid > 0 && parseFloat(p.remainingBalance) === 0);
+        } else if (statusFilter === 'partial') {
+            rows = rows.filter(p => p.totalPaid > 0 && parseFloat(p.remainingBalance) > 0);
+        } else if (statusFilter === 'unpaid') {
+            rows = rows.filter(p => p.totalPaid <= 0);
+        }
+
+        updateStats(rows);
+        updateCharts(rows);
+        renderTable(rows);
+    }
+
+    function renderTable(rows) {
+        const tbody = document.getElementById('paymentsTableBody');
+        if (!rows || rows.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="12" style="text-align:center;padding:50px;color:var(--gray);">
+                <i class="fas fa-inbox" style="font-size:40px;opacity:0.25;display:block;margin-bottom:10px;"></i>
+                لا توجد مدفوعات
+            </td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = rows.map(p => {
+            const student = allStudents.find(s => String(s.id) === String(p.studentId));
+            const group = student?.groupId ? allGroups.find(g => String(g.id) === String(student.groupId)) : null;
+            const courseName = group?.courseName || group?.name || '-';
+
+            const remaining = parseFloat(p.remainingBalance) || 0;
+            const paid = p.totalPaid || 0;
+            const totalFee = parseFloat(p.totalLevelFee) || parseFloat(p.totalFee) || 0;
+            const discountTotal = p.totalDiscount || 0;
+
+            let statusLabel, statusClass;
+            if (paid > 0 && remaining === 0) {
+                statusLabel = 'مدفوع بالكامل'; statusClass = 'status-paid';
+            } else if (paid > 0 && remaining > 0) {
+                statusLabel = 'جزئي'; statusClass = 'status-partial';
+            } else {
+                statusLabel = 'غير مدفوع'; statusClass = 'status-unpaid';
+            }
+
+            let lastReceipt = '-';
+            let dateStr = '-';
+            if (p.allAmounts && p.allAmounts.length > 0) {
+                const lastPayment = p.allAmounts[p.allAmounts.length - 1];
+                lastReceipt = lastPayment.receipt;
+                const lastDate = lastPayment.date;
+                if (lastDate) {
+                    try { dateStr = new Date(lastDate).toLocaleDateString('ar-EG'); } catch(e) { dateStr = lastDate; }
+                }
+            }
+
+            const levelOrAddon = p.paymentType === 'Course Payment' 
+                ? `Level ${p.levelNumber || 1}` 
+                : `<span style="color:var(--gold);"><i class="fas fa-plus-circle"></i> إضافة</span>`;
+
+            let paidDisplay = `<strong>${paid.toLocaleString('ar-EG')}</strong> ج.م`;
+            if (p.allAmounts && p.allAmounts.length > 1) {
+                const breakdown = p.allAmounts.map(a => `${a.amount.toLocaleString('ar-EG')} ج.م (${a.receipt})`).join(' + ');
+                paidDisplay = `<span title="${breakdown}" style="cursor:help;border-bottom:1px dashed var(--primary-blue);">
+                    <strong>${paid.toLocaleString('ar-EG')}</strong> ج.م
+                    <small style="color:var(--primary-blue);font-weight:700;">(${p.allAmounts.length} دفعات)</small>
+                </span>`;
+            }
+
+            return `<tr>
+                <td style="font-size:12px;color:var(--gray);">${dateStr}</td>
+                <td>
+                    <strong style="color:var(--dark-blue);">${p.studentName || student?.name || '-'}</strong>
+                    <br><code style="background:#f0f4ff;padding:2px 7px;border-radius:5px;font-size:10px;">${student?.code || '-'}</code>
+                </td>
+                <td><span style="background:#e8f0fe;color:var(--dark-blue);padding:3px 10px;border-radius:10px;font-weight:800;font-size:13px;">${levelOrAddon}</span></td>
+                <td><strong style="color:var(--dark-blue);">${lastReceipt}</strong></td>
+                <td style="color:var(--success);font-weight:600;">${paidDisplay}</td>
+                <td style="color:var(--danger);">${discountTotal > 0 ? '-' + discountTotal.toLocaleString('ar-EG') + ' ج.م' : '-'}</td>
+                <td style="color:var(--gray);">${totalFee > 0 ? totalFee.toLocaleString('ar-EG') + ' ج.م' : '-'}</td>
+                <td style="font-weight:700;color:${remaining > 0 ? 'var(--danger)' : 'var(--success)'};">
+                    ${remaining > 0 ? remaining.toLocaleString('ar-EG') + ' ج.م' : '<i class="fas fa-check-circle"></i> مسدد'}
+                </td>
+                <td><span class="status-badge ${statusClass}">${statusLabel}</span></td>
+                <td style="font-size:12px;color:var(--gray);">${dateStr}</td>
+                    <td class="action-buttons">
+                        <!-- Add edit button for individual history payments if needed -->
+                        <button class="btn-icon btn-edit" onclick="editPayment(${p.id})" title="تعديل"><i class="fas fa-edit"></i></button>
+                        <button class="btn-icon btn-delete" onclick="deletePaymentById(${p.id})" title="حذف"><i class="fas fa-trash"></i></button>
+                    </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // =================== MODAL FLOW ===================
+
+    function openAddPaymentModal() {
+        if (allStudents.length === 0) {
+            showToast('لا يوجد طلاب في النظام', 'warning');
+            return;
+        }
+        resetModal();
+        document.getElementById('paymentModal').classList.add('show');
+    }
+
+    function resetModal() {
+        selectedStudentId = null;
+        selectedLevelNumber = null;
+        selectedAddonId = null;
+        paymentCategory = null;
+        currentStep = 1;
+        show('step1'); hide('step2'); hide('step3Level'); hide('step3Addon');
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('savePayment').style.display = 'none';
+        document.getElementById('singleDeptFilter').innerHTML = '<option value="">اختر القسم</option>';
+        if (typeof allDepartments !== 'undefined') {
+            allDepartments.forEach(d => {
+                document.getElementById('singleDeptFilter').innerHTML += `<option value="${d.id}">${d.name}</option>`;
+            });
+        }
+        document.getElementById('singleDeptFilter').value = '';
+        document.getElementById('singleLevelFilter').innerHTML = '<option value="">اختر المستوى</option>';
+        document.getElementById('singleCourseFilter').innerHTML = '<option value="">اختر الكورس</option>';
+        document.getElementById('singleGroupFilter').innerHTML = '<option value="">اختر الجروب</option>';
+        document.getElementById('singleStudentFilter').innerHTML = '<option value="">اختر الطالب</option>';
+        
+        updateStepIndicator(1);
+    }
+
+    function closeModal() {
+        document.getElementById('paymentModal').classList.remove('show');
+    }
+
+    function show(id) { const el = document.getElementById(id); if(el) el.style.display = 'block'; }
+    function hide(id) { const el = document.getElementById(id); if(el) el.style.display = 'none'; }
+
+    function updateStepIndicator(step) {
+        for (let i = 1; i <= 3; i++) {
+            const dot = document.getElementById(`step-dot-${i}`);
+            if (!dot) continue;
+            dot.className = 'step-dot ' + (i < step ? 'done' : i === step ? 'active' : 'inactive');
+        }
+        const line1 = document.getElementById('step-line-1');
+        const line2 = document.getElementById('step-line-2');
+        if (line1) line1.className = 'step-line' + (step > 1 ? ' done' : '');
+        if (line2) line2.className = 'step-line' + (step > 2 ? ' done' : '');
+    }
+
+    window.goBack = function() {
+        if (paymentCategory !== null) {
+            paymentCategory = null;
+            selectedLevelNumber = null;
+            selectedAddonId = null;
+            hide('step3Level'); hide('step3Addon');
+            document.getElementById('editPaymentId').value = '';
+            document.getElementById('modalTitle').textContent = 'تسجيل دفعة جديدة';
+            show('step2');
+            document.getElementById('savePayment').style.display = 'none';
+            updateStepIndicator(2);
+        } else {
+            hide('step2');
+            show('step1');
+            document.getElementById('backBtn').style.display = 'none';
+            selectedStudentId = null;
+            updateStepIndicator(1);
+        }
+    };
+
+    // Single Payment Cascading Filters
+    const singleDeptFilter = document.getElementById('singleDeptFilter');
+    const singleLevelFilter = document.getElementById('singleLevelFilter');
+    const singleCourseFilter = document.getElementById('singleCourseFilter');
+    const singleGroupFilter = document.getElementById('singleGroupFilter');
+    const singleStudentFilter = document.getElementById('singleStudentFilter');
+
+    if (singleDeptFilter) {
+        singleDeptFilter.addEventListener('change', () => {
+            const deptId = singleDeptFilter.value;
+            singleLevelFilter.innerHTML = '<option value="">اختر المستوى</option>';
+            singleCourseFilter.innerHTML = '<option value="">اختر الكورس</option>';
+            singleGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            singleStudentFilter.innerHTML = '<option value="">اختر الطالب</option>';
+            
+            if (deptId) {
+                let maxLevels = 0;
+                const courses = allCourses.filter(c => c.deptId == deptId);
+                courses.forEach(c => {
+                    const lvls = parseInt(c.durationLevels) || 1;
+                    if (lvls > maxLevels) maxLevels = lvls;
+                });
+                for (let i = 1; i <= maxLevels; i++) {
+                    singleLevelFilter.innerHTML += `<option value="${i}">Level ${i}</option>`;
+                }
+            }
+        });
+    }
+
+    if (singleLevelFilter) {
+        singleLevelFilter.addEventListener('change', () => {
+            const deptId = singleDeptFilter.value;
+            const levelId = singleLevelFilter.value;
+            singleCourseFilter.innerHTML = '<option value="">اختر الكورس</option>';
+            singleGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            singleStudentFilter.innerHTML = '<option value="">اختر الطالب</option>';
+            
+            if (deptId && levelId) {
+                const lvl = parseInt(levelId);
+                const courses = allCourses.filter(c => c.deptId == deptId && (parseInt(c.durationLevels)||1) >= lvl);
+                courses.forEach(c => {
+                    singleCourseFilter.innerHTML += `<option value="${c.id}">${c.courseName||c.name}</option>`;
+                });
+            }
+        });
+    }
+
+    if (singleCourseFilter) {
+        singleCourseFilter.addEventListener('change', () => {
+            const courseId = singleCourseFilter.value;
+            const levelId = singleLevelFilter.value;
+            singleGroupFilter.innerHTML = '<option value="">اختر الجروب</option>';
+            singleStudentFilter.innerHTML = '<option value="">اختر الطالب</option>';
+            
+            if (courseId) {
+                const groups = allGroups.filter(g => g.courseId == courseId && String(g.level) === String(levelId));
+                groups.forEach(g => {
+                    singleGroupFilter.innerHTML += `<option value="${g.id}">${g.name}</option>`;
+                });
+            }
+        });
+    }
+
+    if (singleGroupFilter) {
+        singleGroupFilter.addEventListener('change', () => {
+            const groupId = singleGroupFilter.value;
+            singleStudentFilter.innerHTML = '<option value="">اختر الطالب</option>';
+            if (groupId) {
+                const studentsInGroup = allStudents.filter(s => s.groupId == groupId);
+                studentsInGroup.forEach(s => {
+                    singleStudentFilter.innerHTML += `<option value="${s.id}">${s.name} ${s.code ? '('+s.code+')' : ''}</option>`;
+                });
+            }
+        });
+    }
+
+    if (singleStudentFilter) {
+        singleStudentFilter.addEventListener('change', () => {
+            const studentId = singleStudentFilter.value;
+            if (studentId) {
+                selectStudent(studentId);
+            }
+        });
+    }
+
+    window.selectStudent = function(id) {
+        const student = allStudents.find(s => String(s.id) === String(id));
+        if (!student) return;
+        selectedStudentId = id;
+
+        hide('step1');
+        show('step2');
+        document.getElementById('backBtn').style.display = 'inline-flex';
+        updateStepIndicator(2);
+
+        let courseName = 'غير محدد';
+        if (student.groupId) {
+            const group = allGroups.find(g => String(g.id) === String(student.groupId));
+            if (group) courseName = group.courseName || group.name || courseName;
+        }
+        document.getElementById('selectedStudentDisplay').textContent = `${student.name}  ${student.code ? '(' + student.code + ')' : ''}`;
+        document.getElementById('selectedStudentCourse').innerHTML = `<i class="fas fa-book-open"></i> الكورس: ${courseName}`;
+    };
+
+    window.choosePaymentCategory = function(cat) {
+        paymentCategory = cat;
+        hide('step2');
+        updateStepIndicator(3);
+
+        if (cat === 'level') {
+            show('step3Level');
+            const student = allStudents.find(s => String(s.id) === String(selectedStudentId));
+            if (student) {
+                document.getElementById('studentInfoBar2').textContent = `${student.name}  ${student.code ? '(' + student.code + ')' : ''}`;
+            }
+            buildLevelButtons();
+        } else {
+            show('step3Addon');
+            const student = allStudents.find(s => String(s.id) === String(selectedStudentId));
+            if (student) {
+                document.getElementById('studentInfoBar3').textContent = `${student.name}  ${student.code ? '(' + student.code + ')' : ''}`;
+            }
+            buildAddonList();
+        }
+    };
+
+    // =================== LEVEL BUTTONS ===================
+
+    function buildLevelButtons() {
+        const student = allStudents.find(s => String(s.id) === String(selectedStudentId));
+        if (!student) return;
+
+        let totalLevels = 1;
+        let pricePerLevel = 0;
+
+        if (student.groupId) {
+            const group = allGroups.find(g => String(g.id) === String(student.groupId));
+            if (group) {
+                const course = allCourses.find(c => String(c.id) === String(group.courseId));
+                if (course) {
+                    totalLevels = parseInt(course.durationLevels) || parseInt(group.levelCount) || 1;
+                    pricePerLevel = parseFloat(course.pricePerLevel) || 0;
+                }
+            }
+        }
+
+        const container = document.getElementById('levelButtons');
+        hide('levelPaymentDetails');
+        hide('levelPayForm');
+
+        if (totalLevels === 0 || totalLevels > 20) {
+            container.innerHTML = `<div style="color:var(--gray);padding:10px;text-align:center;">
+                لا توجد مستويات محددة لهذا الطالب
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = '';
+
+        for (let i = 1; i <= totalLevels; i++) {
+            const levelPayments = allPayments.filter(p =>
+                String(p.studentId) === String(selectedStudentId) &&
+                String(p.levelNumber) === String(i) &&
+                p.paymentType === 'Course Payment'
+            );
+            const totalPaid = levelPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid)||0), 0);
+            const totalDiscount = levelPayments.reduce((sum, p) => sum + (parseFloat(p.discountAmount)||0), 0);
+            const storedFee = levelPayments.length > 0
+                ? (parseFloat(levelPayments[0].totalLevelFee) || parseFloat(levelPayments[0].totalFee) || pricePerLevel)
+                : pricePerLevel;
+            const remaining = Math.max(0, storedFee - totalPaid - totalDiscount);
+            const isPaid = totalPaid > 0 && remaining === 0;
+            const isPartial = totalPaid > 0 && remaining > 0;
+
+            let bg, border, badge;
+            if (isPaid) {
+                bg = '#e8f5e9'; border = '#4caf50';
+                badge = `<div style="color:#2e7d32;font-size:11px;margin-top:5px;"><i class="fas fa-check-circle"></i> مدفوع</div>`;
+            } else if (isPartial) {
+                bg = '#fff3e0'; border = '#ff9800';
+                badge = `<div style="color:#e65100;font-size:11px;margin-top:5px;"><i class="fas fa-exclamation-circle"></i> متبقي ${remaining.toLocaleString()}</div>`;
+            } else {
+                bg = 'white'; border = '#dee2e6';
+                badge = `<div style="color:#c62828;font-size:11px;margin-top:5px;"><i class="fas fa-times-circle"></i> لم يُدفع</div>`;
+            }
+
+            const btn = document.createElement('div');
+            btn.className = 'level-btn';
+            btn.style.cssText = `border-color:${border};background:${bg};`;
+            btn.innerHTML = `
+                <div style="font-weight:800;font-size:18px;color:var(--dark-blue);">L${i}</div>
+                <div style="font-size:12px;color:var(--gray);margin:3px 0;">${storedFee > 0 ? storedFee.toLocaleString() + ' ج.م' : 'غير محدد'}</div>
+                ${totalPaid > 0 ? `<div style="font-size:11px;color:var(--success);font-weight:700;">✓ ${totalPaid.toLocaleString()} ج.م</div>` : ''}
+                ${badge}
+            `;
+            btn.onclick = () => selectLevel(i, storedFee || pricePerLevel);
+            container.appendChild(btn);
+        }
+    }
+
+    window.selectLevel = function(levelNum, pricePerLevel) {
+        selectedLevelNumber = levelNum;
+
+        // Highlight selected
+        document.querySelectorAll('.level-btn').forEach(b => b.style.boxShadow = '');
+        event && event.currentTarget && (event.currentTarget.style.boxShadow = '0 0 0 3px var(--primary-blue)');
+
+        const levelPayments = allPayments.filter(p =>
+            String(p.studentId) === String(selectedStudentId) &&
+            String(p.levelNumber) === String(levelNum) &&
+            p.paymentType === 'Course Payment'
+        );
+        const totalPaid = levelPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid)||0), 0);
+        const totalDiscount = levelPayments.reduce((sum, p) => sum + (parseFloat(p.discountAmount)||0), 0);
+        const storedFee = levelPayments.length > 0
+            ? (parseFloat(levelPayments[0].totalLevelFee) || parseFloat(levelPayments[0].totalFee) || pricePerLevel)
+            : pricePerLevel;
+        const remaining = Math.max(0, storedFee - totalPaid - totalDiscount);
+        const isPaid = totalPaid > 0 && remaining === 0;
+
+        const details = document.getElementById('levelPaymentDetails');
+        const banner  = document.getElementById('levelStatusBanner');
+        const history = document.getElementById('levelPayHistory');
+        const form    = document.getElementById('levelPayForm');
+
+        details.style.display = 'block';
+
+        if (isPaid) {
+            banner.style.cssText = 'padding:12px;border-radius:8px;background:#e8f5e9;color:#2e7d32;text-align:center;font-weight:700;margin-bottom:12px;';
+            banner.innerHTML = `<i class="fas fa-check-circle" style="font-size:20px;"></i><br>هذا المستوى مدفوع بالكامل ✅<br><small>إجمالي المدفوع: ${totalPaid.toLocaleString()} ج.م</small>`;
+            form.style.display = 'none';
+            document.getElementById('savePayment').style.display = 'none';
+        } else {
+            if (totalPaid === 0 && totalDiscount === 0) {
+                banner.style.cssText = 'padding:12px;border-radius:8px;background:#fdecea;color:#c62828;text-align:center;font-weight:700;margin-bottom:12px;';
+                banner.innerHTML = `<i class="fas fa-times-circle"></i> لم يتم الدفع بعد<br><small>المطلوب: <strong>${storedFee.toLocaleString()} ج.م</strong></small>`;
+            } else {
+                banner.style.cssText = 'padding:12px;border-radius:8px;background:#fff3e0;color:#e65100;text-align:center;font-weight:700;margin-bottom:12px;';
+                banner.innerHTML = `<i class="fas fa-exclamation-circle"></i> دفع جزئي<br>
+                    <small>تم دفع <strong>${totalPaid.toLocaleString()} ج.م</strong> • المتبقي: <strong style="color:#c62828;">${remaining.toLocaleString()} ج.م</strong></small>`;
+            }
+            form.style.display = 'block';
+            document.getElementById('totalLevelFee').value = storedFee || pricePerLevel || 0;
+            document.getElementById('paidBefore').value = totalPaid || 0;
+            document.getElementById('currentRemaining').value = remaining || 0;
+            document.getElementById('amountPaid').value = '';
+            document.getElementById('discountAmount').value = '0';
+            document.getElementById('notes').value = '';
+            document.querySelectorAll('input[name="payMode"]').forEach(r => r.checked = false);
+            document.getElementById('paymentDate').valueAsDate = new Date();
+            document.getElementById('savePayment').style.display = 'inline-flex';
+            document.getElementById('remainingPreview').style.display = 'none';
+        }
+
+        // History table
+        if (levelPayments.length > 0) {
+            history.innerHTML = `
+                <div style="font-weight:700;margin-bottom:8px;color:var(--dark-blue);font-size:13px;">
+                    <i class="fas fa-history"></i> سجل الدفعات للمستوى ${levelNum}:
+                </div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                    <tr style="background:var(--dark-blue);color:white;">
+                        <th style="padding:7px;border:1px solid #dee2e6;">#</th>
+                        <th style="padding:7px;border:1px solid #dee2e6;">التاريخ</th>
+                        <th style="padding:7px;border:1px solid #dee2e6;">المبلغ</th>
+                        <th style="padding:7px;border:1px solid #dee2e6;">خصم</th>
+                        <th style="padding:7px;border:1px solid #dee2e6;">المتبقي</th>
+                    </tr>
+                    ${levelPayments.map((p, idx) => `
+                        <tr style="background:${idx%2===0?'white':'#f8f9fa'}">
+                            <td style="padding:6px;border:1px solid #e9ecef;text-align:center;font-weight:700;">${idx+1}</td>
+                            <td style="padding:6px;border:1px solid #e9ecef;">${p.paymentDate || '-'}</td>
+                            <td style="padding:6px;border:1px solid #e9ecef;color:var(--success);font-weight:700;">${(parseFloat(p.amountPaid)||0).toLocaleString()} ج.م</td>
+                            <td style="padding:6px;border:1px solid #e9ecef;color:var(--danger);">${parseFloat(p.discountAmount)>0 ? '-'+(parseFloat(p.discountAmount)).toLocaleString()+' ج.م' : '-'}</td>
+                            <td style="padding:6px;border:1px solid #e9ecef;font-weight:700;color:${parseFloat(p.remainingBalance)>0?'var(--danger)':'var(--success)'};">${(parseFloat(p.remainingBalance)||0).toLocaleString()} ج.م</td>
+                        </tr>
+                    `).join('')}
+                    <tr style="background:#e8f5e9;font-weight:800;">
+                        <td colspan="2" style="padding:8px;border:1px solid #dee2e6;">الإجمالي</td>
+                        <td style="padding:8px;border:1px solid #dee2e6;color:var(--success);">${totalPaid.toLocaleString()} ج.م</td>
+                        <td style="padding:8px;border:1px solid #dee2e6;color:var(--danger);">${totalDiscount>0?'-'+totalDiscount.toLocaleString()+' ج.م':'-'}</td>
+                        <td style="padding:8px;border:1px solid #dee2e6;color:${remaining>0?'var(--danger)':'var(--success)'};">${remaining.toLocaleString()} ج.م</td>
+                    </tr>
+                </table>`;
+        } else {
+            history.innerHTML = `<div style="padding:10px;text-align:center;color:var(--gray);font-size:13px;">لا توجد دفعات سابقة لهذا المستوى</div>`;
+        }
+    };
+
+    window.onPayModeChange = function() {
+        const mode = document.querySelector('input[name="payMode"]:checked')?.value;
+        const totalFeeEl = document.getElementById('totalLevelFee');
+        const amountEl = document.getElementById('amountPaid');
+
+        if (!mode) return;
+
+        if (mode === 'full') {
+            // Calculate what's remaining and set that as amount
+            const storedFee = parseFloat(totalFeeEl.value) || 0;
+            const prevPayments = allPayments.filter(p =>
+                String(p.studentId) === String(selectedStudentId) &&
+                String(p.levelNumber) === String(selectedLevelNumber) &&
+                p.paymentType === 'Course Payment'
+            );
+            const prevPaid = prevPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid)||0), 0);
+            const prevDiscount = prevPayments.reduce((sum, p) => sum + (parseFloat(p.discountAmount)||0), 0);
+            const leftover = Math.max(0, storedFee - prevPaid - prevDiscount);
+            amountEl.value = leftover;
+            amountEl.readOnly = true;
+            amountEl.style.background = '#f0f0f0';
+        } else {
+            amountEl.readOnly = false;
+            amountEl.style.background = '';
+            amountEl.value = '';
+        }
+        updateRemainingPreview();
+    };
+
+    window.updateRemainingPreview = function() {
+        const total = parseFloat(document.getElementById('totalLevelFee').value) || 0;
+        const paid  = parseFloat(document.getElementById('amountPaid').value) || 0;
+        const disc  = parseFloat(document.getElementById('discountAmount').value) || 0;
+
+        const prevPayments = allPayments.filter(p =>
+            String(p.studentId) === String(selectedStudentId) &&
+            String(p.levelNumber) === String(selectedLevelNumber) &&
+            p.paymentType === 'Course Payment'
+        );
+        const prevPaid = prevPayments.reduce((sum, p) => sum + (parseFloat(p.amountPaid)||0), 0);
+        const prevDisc = prevPayments.reduce((sum, p) => sum + (parseFloat(p.discountAmount)||0), 0);
+
+        const newRemaining = Math.max(0, total - prevPaid - prevDisc - paid - disc);
+        const preview = document.getElementById('remainingPreview');
+
+        if (paid > 0 || disc > 0) {
+            preview.style.display = 'block';
+            if (newRemaining === 0) {
+                preview.style.cssText = 'display:block;padding:12px;border-radius:10px;text-align:center;font-weight:700;border:2px solid #4caf50;background:#e8f5e9;color:#2e7d32;margin-bottom:12px;';
+                preview.innerHTML = `<i class="fas fa-check-circle"></i> سيتم سداد المبلغ بالكامل ✅`;
+            } else {
+                preview.style.cssText = 'display:block;padding:12px;border-radius:10px;text-align:center;font-weight:700;border:2px solid #ff9800;background:#fff3e0;color:#e65100;margin-bottom:12px;';
+                preview.innerHTML = `<i class="fas fa-info-circle"></i> المتبقي بعد هذه الدفعة: <strong>${newRemaining.toLocaleString('ar-EG')} ج.م</strong>`;
+            }
+        } else {
+            preview.style.display = 'none';
+        }
+    };
+
+    // =================== ADDON ===================
+
+    function buildAddonList() {
+        const student = allStudents.find(s => String(s.id) === String(selectedStudentId));
+        let courseId = null;
+        if (student?.groupId) {
+            const group = allGroups.find(g => String(g.id) === String(student.groupId));
+            if (group) courseId = group.courseId;
+        }
+
+        const relevantAddons = allAddOns.filter(a => !a.courseId || !courseId || String(a.courseId) === String(courseId));
+        const container = document.getElementById('addonList');
+
+        if (!relevantAddons.length) {
+            container.innerHTML = `<div style="padding:20px;text-align:center;color:var(--gray);">لا توجد إضافات متاحة</div>`;
+            return;
+        }
+
+        container.innerHTML = relevantAddons.map(a => {
+            const alreadyPaid = allPayments.some(p =>
+                String(p.studentId) === String(selectedStudentId) &&
+                String(p.levelNumber) === String(a.id) &&
+                p.paymentType === 'AddOn Payment'
+            );
+            return `<div onclick="${alreadyPaid ? '' : `selectAddon(${a.id}, '${(a.name||'').replace(/'/g,"\\'")}', ${a.price||0})`}"
+                style="flex:1;min-width:140px;padding:15px;border:2px solid ${alreadyPaid?'#4caf50':'#e9ecef'};border-radius:12px;
+                       cursor:${alreadyPaid?'not-allowed':'pointer'};text-align:center;background:${alreadyPaid?'#f5f5f5':'white'};
+                       opacity:${alreadyPaid?'0.7':'1'};transition:all 0.2s;"
+                ${!alreadyPaid ? 'onmouseover="this.style.borderColor=\'#3c6ec8\';this.style.transform=\'scale(1.03)\'" onmouseout="this.style.borderColor=\'#e9ecef\';this.style.transform=\'scale(1)\'"' : ''}>
+                <i class="fas fa-puzzle-piece" style="font-size:22px;color:var(--gold);display:block;margin-bottom:8px;"></i>
+                <div style="font-weight:700;font-size:14px;">${a.name}</div>
+                <div style="color:var(--primary-blue);font-weight:700;margin-top:4px;">${(a.price||0).toLocaleString()} ج.م</div>
+                ${alreadyPaid ? '<div style="color:#2e7d32;font-size:11px;margin-top:5px;"><i class="fas fa-check-circle"></i> مدفوع بالفعل</div>' : ''}
+            </div>`;
+        }).join('');
+    }
+
+    window.selectAddon = function(addonId, addonName, addonPrice) {
+        selectedAddonId = addonId;
+        document.getElementById('addonPayForm').style.display = 'block';
+        document.getElementById('addonSelectedInfo').innerHTML =
+            `<i class="fas fa-puzzle-piece" style="color:var(--gold);font-size:16px;"></i>
+             الإضافة: <strong>${addonName}</strong>
+             <span style="margin-right:10px;color:var(--primary-blue);">السعر: <strong>${addonPrice.toLocaleString()} ج.م</strong></span>`;
+        document.getElementById('addonPaymentDate').valueAsDate = new Date();
+        document.getElementById('savePayment').style.display = 'inline-flex';
+    };
+
+    // =================== SAVE ===================
+
+    async function completePayment() {
+        if (!selectedStudentId) { showToast('يرجى اختيار طالب', 'warning'); return; }
+        const student = allStudents.find(s => String(s.id) === String(selectedStudentId));
+        
+        let paymentData = null;
+
+        if (paymentCategory === 'course') {
+            if (!selectedLevelNumber) { showToast('يرجى اختيار المستوى', 'warning'); return; }
+            const amountPaid = parseFloat(document.getElementById('amountPaid').value) || 0;
+            const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+            const totalFee = parseFloat(document.getElementById('totalLevelFee').value) || 0;
+            const receiptNum = document.getElementById('receiptNumber').value.trim();
+            const payDate = document.getElementById('paymentDate').value;
+
+            if (amountPaid <= 0 && discountAmount <= 0) { showToast('أدخل المبلغ المدفوع أو الخصم', 'warning'); return; }
+            if (totalFee <= 0) { showToast('أدخل إجمالي رسوم المستوى', 'warning'); return; }
+            if (!payDate) { showToast('أدخل تاريخ الدفع', 'warning'); return; }
+            if (!receiptNum) { showToast('أدخل رقم الإيصال', 'warning'); return; }
+
+            paymentData = {
+                id: document.getElementById('editPaymentId').value || null,
+                studentId: student.id,
+                studentName: student.name,
+                levelNumber: selectedLevelNumber,
+                paymentType: 'Course Payment',
+                totalLevelFee: totalFee,
+                amountPaid: amountPaid,
+                discountAmount: discountAmount,
+                remainingBalance: Math.max(0, totalFee - amountPaid - discountAmount),
+                notes: document.getElementById('notes').value,
+                receiptNumber: receiptNum,
+                paymentDate: payDate,
+                createdBy: currentUser.id
+            };
+
+        } else {
+            if (!selectedAddonId) { showToast('يرجى اختيار الإضافة', 'warning'); return; }
+            const addon = allAddOns.find(a => String(a.id) === String(selectedAddonId));
+            if (!addon) { showToast('الإضافة غير موجودة', 'error'); return; }
+            const payDate = document.getElementById('addonPaymentDate').value;
+            const receiptNum = document.getElementById('addonReceiptNumber').value.trim();
+            
+            if (!payDate) { showToast('أدخل تاريخ الدفع', 'warning'); return; }
+            if (!receiptNum) { showToast('أدخل رقم الإيصال', 'warning'); return; }
+
+            paymentData = {
+                id: document.getElementById('editPaymentId').value || null,
+                studentId: student.id,
+                studentName: student.name,
+                levelNumber: selectedAddonId,
+                paymentType: 'AddOn Payment',
+                totalLevelFee: addon.price || 0,
+                amountPaid: addon.price || 0,
+                discountAmount: 0,
+                remainingBalance: 0,
+                notes: document.getElementById('addonNotes').value,
+                receiptNumber: receiptNum,
+                paymentDate: payDate,
+                createdBy: currentUser.id
+            };
+        }
+
+        if (paymentData) {
+            await doSave(paymentData);
+        }
+    }
+
+    async function doSave(paymentData) {
+        showLoading(true, 'جاري حفظ الدفعة...');
+        try {
+            const res = await apiCall('savePayment', { paymentData });
+            const msg = (typeof res === 'object' && res.message) ? res.message : 'تم تسجيل الدفعة بنجاح';
+            showToast(msg + ' ✅', 'success');
+            closeModal();
+            await loadData();
+        } catch(e) {
+            console.error('Save error:', e);
+            showToast('خطأ في الحفظ: ' + e.message, 'error');
+        }
+        showLoading(false);
+    }
+
+    window.deletePaymentById = async function(id) {
+        if (!id) return;
+        if (!confirm('هل أنت متأكد من حذف هذه الدفعة؟')) return;
+        showLoading(true, 'جاري الحذف...');
+        try {
+            await apiCall('deletePayment', { paymentId: id });
+            showToast('تم الحذف بنجاح', 'success');
+            await loadData();
+        } catch(e) {
+            showToast('خطأ في الحذف: ' + e.message, 'error');
+        }
+        showLoading(false);
+    };
+</script>
+
+<script src="sidebar.js"></script>
+</body>
+</html>
+
